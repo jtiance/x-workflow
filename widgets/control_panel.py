@@ -43,7 +43,6 @@ class ControlPanel(QWidget):
         
         # 拖拽相关
         self.dragging_control = None
-        self.drop_indicator = None
         
         # 初始化 UI
         self._init_ui()
@@ -82,7 +81,7 @@ class ControlPanel(QWidget):
         
         # 管理流程按钮（图标）
         self.load_button = QPushButton("📋")
-        self.load_button.setToolTip("管理流程")
+        self.load_button.setToolTip("流程管理器")
         self.load_button.setMinimumSize(50, 40)
         self.load_button.setMaximumSize(50, 40)
         self.load_button.setObjectName("LoadButton")
@@ -167,17 +166,14 @@ class ControlPanel(QWidget):
         # 连接拖拽开始信号
         control_widget.drag_started.connect(self._on_control_drag_started)
         
+        # 连接禁用和删除信号
+        if hasattr(control_widget, 'disable_requested'):
+            control_widget.disable_requested.connect(self._on_control_disable_requested)
+        if hasattr(control_widget, 'delete_requested'):
+            control_widget.delete_requested.connect(self._on_control_delete_requested)
+        
         # 保存到控件列表
         self.controls.append(control_widget)
-        
-    def _on_control_drag_started(self, control):
-        """
-        当控件开始拖拽时调用
-        
-        Args:
-            control: 被拖拽的控件
-        """
-        self.dragging_control = control
         
     def remove_control(self, control_widget):
         """
@@ -187,12 +183,6 @@ class ControlPanel(QWidget):
             control_widget: 要移除的控件
         """
         if control_widget in self.controls:
-            # 断开拖拽信号
-            try:
-                control_widget.drag_started.disconnect(self._on_control_drag_started)
-            except:
-                pass
-                
             # 从布局中移除
             self.scroll_layout.removeWidget(control_widget)
             # 从列表中移除
@@ -243,7 +233,11 @@ class ControlPanel(QWidget):
         # 根据配置创建控件
         from controls.text_replace import TextReplaceControl
         from controls.json_format import JsonFormatControl
-        from controls.add_prefix import AddPrefixControl
+        from controls.add_text import AddTextControl
+        from controls.case_convert import CaseConvertControl
+        from controls.text_split import TextSplitControl
+        from controls.text_merge import TextMergeControl
+        from controls.text_search_delete import TextSearchDeleteControl
         
         for config in configs:
             control_type = config.get("type")
@@ -256,11 +250,36 @@ class ControlPanel(QWidget):
                 control = JsonFormatControl()
                 control.load_config(config)
                 self.add_control(control)
-            elif control_type == "add_prefix":
-                control = AddPrefixControl()
+            elif control_type == "add_text":
+                control = AddTextControl()
                 control.load_config(config)
                 self.add_control(control)
-                
+            elif control_type == "case_convert":
+                control = CaseConvertControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "text_split":
+                control = TextSplitControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "text_merge":
+                control = TextMergeControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "text_search_delete":
+                control = TextSearchDeleteControl()
+                control.load_config(config)
+                self.add_control(control)
+    
+    def _on_control_drag_started(self, control):
+        """
+        当控件开始拖拽时调用
+        
+        Args:
+            control: 被拖拽的控件
+        """
+        self.dragging_control = control
+    
     def dragEnterEvent(self, event):
         """
         拖拽进入事件
@@ -288,9 +307,10 @@ class ControlPanel(QWidget):
         Args:
             event: 拖拽事件
         """
-        if event.mimeData().hasText() and event.mimeData().text() == "拖动控件以改变顺序" and self.dragging_control:
-            # 获取放下位置相对于滚动内容的位置
-            drop_pos = self.scroll_content.mapFrom(self, event.position().toPoint())
+        if event.mimeData().hasText() and event.mimeData().text() == "拖动控件以改变顺序":
+            # 获取拖拽位置（相对于滚动内容）
+            drop_pos = event.position().toPoint()
+            drop_pos = self.scroll_content.mapFromGlobal(drop_pos)
             
             # 找到插入位置
             insert_index = self._find_insert_index(drop_pos)
@@ -342,9 +362,29 @@ class ControlPanel(QWidget):
         # 确定新的插入位置
         if old_index < insert_index:
             insert_index -= 1  # 因为移除了一个元素，索引要减1
-            
+        
         # 插入到新位置
         self.controls.insert(insert_index, dragged_control)
         
         # 在布局中插入控件
         self.scroll_layout.insertWidget(insert_index, dragged_control)
+    
+    def _on_control_disable_requested(self, control):
+        """
+        处理控件禁用请求
+        
+        Args:
+            control: 要禁用的控件
+        """
+        # 禁用状态的处理逻辑已经在控件内部实现
+        # 这里可以添加额外的处理逻辑，比如更新状态栏等
+        pass
+    
+    def _on_control_delete_requested(self, control):
+        """
+        处理控件删除请求
+        
+        Args:
+            control: 要删除的控件
+        """
+        self.remove_control(control)

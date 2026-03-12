@@ -5,7 +5,7 @@ JSON格式化控件模块
 """
 
 import json
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QCheckBox, QSpinBox, QSizePolicy
+from PySide6.QtWidgets import QGridLayout, QLabel, QCheckBox, QSpinBox, QSizePolicy
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -33,44 +33,45 @@ class JsonFormatControl(BaseControl):
         """
         layout = self.get_content_layout()
         
-        # 1. 缩进设置
-        indent_layout = QHBoxLayout()
+        # 使用GridLayout确保对齐
+        grid_layout = QGridLayout()
+        grid_layout.setSpacing(10)
+        grid_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # 第1行：缩进
         indent_label = QLabel("缩进:")
+        indent_label.setMinimumWidth(70)
+        
         self.indent_spin = QSpinBox()
         self.indent_spin.setMinimum(0)
         self.indent_spin.setMaximum(8)
         self.indent_spin.setValue(4)
         self.indent_spin.setSuffix(" 空格")
-        self.indent_spin.setMinimumWidth(150)  # 最小宽度，更宽一点
-        self.indent_spin.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  # 水平方向扩展
+        self.indent_spin.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.indent_spin.valueChanged.connect(self._emit_parameters_changed)
         
-        indent_layout.addWidget(indent_label)
-        indent_layout.addWidget(self.indent_spin)
-        indent_layout.addStretch()
+        grid_layout.addWidget(indent_label, 0, 0)
+        grid_layout.addWidget(self.indent_spin, 0, 1)
         
-        # 2. 排序键
-        sort_layout = QHBoxLayout()
+        # 第2行：按键名排序
         self.sort_checkbox = QCheckBox("按键名排序")
         self.sort_checkbox.setChecked(False)
         self.sort_checkbox.stateChanged.connect(self._emit_parameters_changed)
         
-        sort_layout.addWidget(self.sort_checkbox)
-        sort_layout.addStretch()
+        grid_layout.addWidget(self.sort_checkbox, 1, 0, 1, 2)  # 跨两列
         
-        # 3. 确保ASCII
-        ascii_layout = QHBoxLayout()
+        # 第3行：确保ASCII
         self.ascii_checkbox = QCheckBox("确保ASCII（转义非ASCII字符）")
         self.ascii_checkbox.setChecked(False)
         self.ascii_checkbox.stateChanged.connect(self._emit_parameters_changed)
         
-        ascii_layout.addWidget(self.ascii_checkbox)
-        ascii_layout.addStretch()
+        grid_layout.addWidget(self.ascii_checkbox, 2, 0, 1, 2)  # 跨两列
         
-        # 将所有组件添加到内容布局
-        layout.addLayout(indent_layout)
-        layout.addLayout(sort_layout)
-        layout.addLayout(ascii_layout)
+        # 设置列拉伸，让第二列占据所有剩余空间
+        grid_layout.setColumnStretch(1, 1)
+        
+        # 将GridLayout添加到内容布局
+        layout.addLayout(grid_layout)
         
     def get_indent(self):
         """

@@ -308,17 +308,38 @@ class MainWindow(QMainWindow):
             # 添加到标签页
             tab_content.add_control(control)
             
-        elif control_type == "add_prefix":
-            # 创建增加前缀控件
-            from controls.add_prefix import AddPrefixControl
-            control = AddPrefixControl()
+        elif control_type == "add_text":
+            # 创建增加文本控件
+            from controls.add_text import AddTextControl
+            control = AddTextControl()
             # 添加到标签页
             tab_content.add_control(control)
             
-        elif control_type == "add_suffix":
-            # 创建增加后缀控件
-            from controls.add_suffix import AddSuffixControl
-            control = AddSuffixControl()
+        elif control_type == "case_convert":
+            # 创建大小写转换控件
+            from controls.case_convert import CaseConvertControl
+            control = CaseConvertControl()
+            # 添加到标签页
+            tab_content.add_control(control)
+            
+        elif control_type == "text_split":
+            # 创建文本分割控件
+            from controls.text_split import TextSplitControl
+            control = TextSplitControl()
+            # 添加到标签页
+            tab_content.add_control(control)
+            
+        elif control_type == "text_merge":
+            # 创建文本合并控件
+            from controls.text_merge import TextMergeControl
+            control = TextMergeControl()
+            # 添加到标签页
+            tab_content.add_control(control)
+            
+        elif control_type == "text_search_delete":
+            # 创建文本搜索删除控件
+            from controls.text_search_delete import TextSearchDeleteControl
+            control = TextSearchDeleteControl()
             # 添加到标签页
             tab_content.add_control(control)
             

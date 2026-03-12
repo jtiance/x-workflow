@@ -143,9 +143,11 @@ class ControlDialog(QDialog):
         controls = [
             ("文本替换", "text_replace"),
             ("JSON格式化", "json_format"),
-            ("增加前缀", "add_prefix"),
-            ("增加后缀", "add_suffix"),
-            # 可以在这里添加更多控件
+            ("增加文本", "add_text"),
+            ("大小写转换", "case_convert"),
+            ("文本分割", "text_split"),
+            ("文本合并", "text_merge"),
+            ("文本搜索删除", "text_search_delete"),
         ]
         
         # 添加到列表
@@ -209,6 +211,9 @@ class ControlDialog(QDialog):
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = TextReplaceControl()
             preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
             
             # 设置一些示例数据
             preview_control.set_find_text("hello")
@@ -225,6 +230,9 @@ class ControlDialog(QDialog):
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = JsonFormatControl()
             preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
             
             # 设置一些示例数据
             preview_control.set_indent(4)
@@ -234,31 +242,89 @@ class ControlDialog(QDialog):
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
             
-        elif control_type == "add_prefix":
-            # 增加前缀控件预览
-            from controls.add_prefix import AddPrefixControl
+        elif control_type == "add_text":
+            # 增加文本控件预览
+            from controls.add_text import AddTextControl
             
             # 创建预览控件（禁用交互，只用于显示）
-            preview_control = AddPrefixControl()
+            preview_control = AddTextControl()
             preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
             
             # 设置一些示例数据
-            preview_control.set_prefix("> ")
+            preview_control.set_operation_type("增加前缀")
+            preview_control.set_text("> ")
             
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
             
-        elif control_type == "add_suffix":
-            # 增加后缀控件预览
-            from controls.add_suffix import AddSuffixControl
+        elif control_type == "case_convert":
+            # 大小写转换控件预览
+            from controls.case_convert import CaseConvertControl
             
             # 创建预览控件（禁用交互，只用于显示）
-            preview_control = AddSuffixControl()
+            preview_control = CaseConvertControl()
             preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+            
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+            
+        elif control_type == "text_split":
+            # 文本分割控件预览
+            from controls.text_split import TextSplitControl
+            
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = TextSplitControl()
+            preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
             
             # 设置一些示例数据
-            preview_control.set_suffix(";")
+            preview_control.set_delimiter(",")
+            
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+            
+        elif control_type == "text_merge":
+            # 文本合并控件预览
+            from controls.text_merge import TextMergeControl
+            
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = TextMergeControl()
+            preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+            
+            # 设置一些示例数据
+            preview_control.set_separator(", ")
+            
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+            
+        elif control_type == "text_search_delete":
+            # 文本搜索删除控件预览
+            from controls.text_search_delete import TextSearchDeleteControl
+            
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = TextSearchDeleteControl()
+            preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+            
+            # 设置一些示例数据
+            preview_control.set_search_text("test")
             
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)

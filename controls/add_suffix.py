@@ -4,7 +4,7 @@
 提供为文本每一行增加后缀的功能
 """
 
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit
+from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QSizePolicy
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -32,18 +32,28 @@ class AddSuffixControl(BaseControl):
         """
         layout = self.get_content_layout()
         
-        # 后缀输入行
-        suffix_layout = QHBoxLayout()
+        # 使用GridLayout确保对齐
+        grid_layout = QGridLayout()
+        grid_layout.setSpacing(10)
+        grid_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # 第1行：后缀
         suffix_label = QLabel("后缀:")
+        suffix_label.setMinimumWidth(70)
+        
         self.suffix_input = QLineEdit()
         self.suffix_input.setPlaceholderText("输入要添加的后缀...")
         self.suffix_input.textChanged.connect(self._emit_parameters_changed)
+        self.suffix_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        suffix_layout.addWidget(suffix_label)
-        suffix_layout.addWidget(self.suffix_input)
+        grid_layout.addWidget(suffix_label, 0, 0)
+        grid_layout.addWidget(self.suffix_input, 0, 1)
         
-        # 将组件添加到内容布局
-        layout.addLayout(suffix_layout)
+        # 设置列拉伸，让第二列占据所有剩余空间
+        grid_layout.setColumnStretch(1, 1)
+        
+        # 将GridLayout添加到内容布局
+        layout.addLayout(grid_layout)
         
     def get_suffix(self):
         """

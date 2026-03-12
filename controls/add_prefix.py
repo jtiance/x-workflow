@@ -4,7 +4,7 @@
 提供为文本每一行增加前缀的功能
 """
 
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit
+from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QSizePolicy
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -32,18 +32,28 @@ class AddPrefixControl(BaseControl):
         """
         layout = self.get_content_layout()
         
-        # 前缀输入行
-        prefix_layout = QHBoxLayout()
+        # 使用GridLayout确保对齐
+        grid_layout = QGridLayout()
+        grid_layout.setSpacing(10)
+        grid_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # 第1行：前缀
         prefix_label = QLabel("前缀:")
+        prefix_label.setMinimumWidth(70)
+        
         self.prefix_input = QLineEdit()
         self.prefix_input.setPlaceholderText("输入要添加的前缀...")
         self.prefix_input.textChanged.connect(self._emit_parameters_changed)
+        self.prefix_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        prefix_layout.addWidget(prefix_label)
-        prefix_layout.addWidget(self.prefix_input)
+        grid_layout.addWidget(prefix_label, 0, 0)
+        grid_layout.addWidget(self.prefix_input, 0, 1)
         
-        # 将组件添加到内容布局
-        layout.addLayout(prefix_layout)
+        # 设置列拉伸，让第二列占据所有剩余空间
+        grid_layout.setColumnStretch(1, 1)
+        
+        # 将GridLayout添加到内容布局
+        layout.addLayout(grid_layout)
         
     def get_prefix(self):
         """
