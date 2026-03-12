@@ -30,7 +30,7 @@ class ControlDialog(QDialog):
         super().__init__(parent)
         
         # 设置对话框属性
-        self.setWindowTitle("选择控件")
+        self.setWindowTitle("控件选择器")
         self.setMinimumSize(600, 400)  # 设置最小尺寸
         self.setObjectName("ControlDialog")
         

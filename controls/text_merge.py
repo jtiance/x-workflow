@@ -11,6 +11,16 @@ from PySide6.QtCore import Qt
 from controls.base_control import BaseControl
 
 
+SEPARATOR_MAP = {
+    "无": "",
+    "空格": " ",
+    "逗号": ", ",
+    "分号": "; ",
+    "竖线": "| ",
+    "自定义": None
+}
+
+
 class TextMergeControl(BaseControl):
     """
     文本合并控件类
@@ -38,32 +48,29 @@ class TextMergeControl(BaseControl):
         grid_layout.setSpacing(10)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
-        # 第1行：合并模式
-        mode_label = QLabel("模式:")
-        mode_label.setMinimumWidth(70)
-        
-        self.mode_combo = QComboBox()
-        self.mode_combo.addItems(["直接合并", "用连接符合并", "智能合并"])
-        self.mode_combo.currentTextChanged.connect(self._on_mode_changed)
-        self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
-        self.mode_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        
-        grid_layout.addWidget(mode_label, 0, 0)
-        grid_layout.addWidget(self.mode_combo, 0, 1)
-        
-        # 第2行：连接符
+        # 第1行：连接符
         join_label = QLabel("连接符:")
         join_label.setMinimumWidth(70)
         
         self.join_combo = QComboBox()
-        self.join_combo.setEditable(True)
-        self.join_combo.addItems(["", " ", "\\n", ", ", "; ", "| "])
-        self.join_combo.setCurrentText("\\n")
+        self.join_combo.setEditable(False)
+        self.join_combo.addItems(list(SEPARATOR_MAP.keys()))
+        self.join_combo.setCurrentText("无")
+        self.join_combo.currentTextChanged.connect(self._on_separator_changed)
         self.join_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.join_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(join_label, 1, 0)
-        grid_layout.addWidget(self.join_combo, 1, 1)
+        grid_layout.addWidget(join_label, 0, 0)
+        grid_layout.addWidget(self.join_combo, 0, 1)
+        
+        # 第2行：自定义连接符输入框
+        self.custom_separator_input = QLineEdit()
+        self.custom_separator_input.setPlaceholderText("请输入自定义连接符")
+        self.custom_separator_input.setVisible(False)
+        self.custom_separator_input.textChanged.connect(self._emit_parameters_changed)
+        self.custom_separator_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        
+        grid_layout.addWidget(self.custom_separator_input, 1, 0, 1, 2)
         
         # 第3行：去除每行前后空白
         self.trim_checkbox = QCheckBox("去除每行前后空白")
@@ -79,42 +86,20 @@ class TextMergeControl(BaseControl):
         
         grid_layout.addWidget(self.filter_checkbox, 3, 0, 1, 2)  # 跨两列
         
-        # 保存引用以便控制显隐
-        self.join_label_widget = join_label
-        self.join_combo_widget = self.join_combo
-        
-        # 初始状态：默认用连接符合并，显示连接符
-        self._on_mode_changed("用连接符合并")
-        
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)
         
         # 将GridLayout添加到内容布局
         layout.addLayout(grid_layout)
     
-    def _on_mode_changed(self, mode_text):
-        """合并模式改变时的处理"""
-        if mode_text == "直接合并":
-            self.join_label_widget.hide()
-            self.join_combo_widget.hide()
-        else:
-            self.join_label_widget.show()
-            self.join_combo_widget.show()
-    
-    def get_merge_mode(self):
+    def _on_separator_changed(self, display_text):
         """
-        获取当前合并模式
-        
-        Returns:
-            str: 合并模式
+        当连接符选项改变时调用
         """
-        mode_text = self.mode_combo.currentText()
-        if mode_text == "直接合并":
-            return "direct"
-        elif mode_text == "用连接符合并":
-            return "join"
+        if display_text == "自定义":
+            self.custom_separator_input.setVisible(True)
         else:
-            return "smart"
+            self.custom_separator_input.setVisible(False)
     
     def get_separator(self):
         """
@@ -123,13 +108,12 @@ class TextMergeControl(BaseControl):
         Returns:
             str: 连接符
         """
-        sep = self.join_combo.currentText()
-        # 处理转义字符
-        if sep == "\\n":
-            return "\n"
-        elif sep == "\\t":
-            return "\t"
-        return sep
+        display_text = self.join_combo.currentText()
+        
+        if display_text == "自定义":
+            return self.custom_separator_input.text()
+        
+        return SEPARATOR_MAP.get(display_text, "\n")
     
     def set_separator(self, separator):
         """
@@ -138,13 +122,17 @@ class TextMergeControl(BaseControl):
         Args:
             separator: 连接符
         """
-        # 处理转义字符
-        if separator == "\n":
-            self.join_combo.setCurrentText("\\n")
-        elif separator == "\t":
-            self.join_combo.setCurrentText("\\t")
-        else:
-            self.join_combo.setCurrentText(separator)
+        found = False
+        for display_name, actual_sep in SEPARATOR_MAP.items():
+            if actual_sep == separator:
+                self.join_combo.setCurrentText(display_name)
+                found = True
+                break
+        
+        if not found:
+            self.join_combo.setCurrentText("自定义")
+            self.custom_separator_input.setText(separator)
+            self.custom_separator_input.setVisible(True)
     
     def execute(self, text):
         """
@@ -171,28 +159,16 @@ class TextMergeControl(BaseControl):
         if not processed:
             return ""
         
-        mode = self.get_merge_mode()
         separator = self.get_separator()
-        
-        if mode == "direct":
-            return "".join(processed)
-        elif mode == "join":
-            return separator.join(processed)
-        else:
-            # 智能合并
-            result = []
-            for i, line in enumerate(processed):
-                result.append(line)
-                if i < len(processed) - 1 and separator:
-                    result.append(separator)
-            return "".join(result)
+        return separator.join(processed)
         
     def reset_parameters(self):
         """
         重置参数到默认值
         """
-        self.mode_combo.setCurrentText("用连接符合并")
-        self.join_combo.setCurrentText("\\n")
+        self.join_combo.setCurrentText("换行")
+        self.custom_separator_input.setText("")
+        self.custom_separator_input.setVisible(False)
         self.trim_checkbox.setChecked(True)
         self.filter_checkbox.setChecked(True)
         
@@ -205,7 +181,6 @@ class TextMergeControl(BaseControl):
         """
         return {
             "type": "text_merge",
-            "merge_mode": self.get_merge_mode(),
             "separator": self.get_separator(),
             "trim_whitespace": self.trim_checkbox.isChecked(),
             "filter_empty": self.filter_checkbox.isChecked()
@@ -219,14 +194,7 @@ class TextMergeControl(BaseControl):
             config: 控件配置字典
         """
         if config.get("type") == "text_merge":
-            merge_mode = config.get("merge_mode", "join")
-            if merge_mode == "direct":
-                self.mode_combo.setCurrentText("直接合并")
-            elif merge_mode == "join":
-                self.mode_combo.setCurrentText("用连接符合并")
-            else:
-                self.mode_combo.setCurrentText("智能合并")
-            self.set_separator(config.get("separator", "\\n"))
+            self.set_separator(config.get("separator", "\n"))
             self.trim_checkbox.setChecked(config.get("trim_whitespace", True))
             self.filter_checkbox.setChecked(config.get("filter_empty", True))
             

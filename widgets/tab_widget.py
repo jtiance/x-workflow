@@ -5,7 +5,7 @@
 """
 
 import json
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QSplitter, QVBoxLayout, QLabel, QFileDialog, QApplication
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QSplitter, QVBoxLayout, QLabel, QFileDialog, QApplication, QFrame
 from PySide6.QtCore import Qt, Signal
 
 from widgets.control_panel import ControlPanel
@@ -100,7 +100,7 @@ class TabContent(QWidget):
         # 创建右侧容器（包含文本编辑器和按钮列表）
         right_container = QWidget()
         right_layout = QVBoxLayout(right_container)
-        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setContentsMargins(0, 0, 20, 0)  # 右侧间隙20px
         right_layout.setSpacing(15)  # 设置间距，让按钮区域和文本框拉开距离
         
         # 创建分割器，左右分隔
@@ -116,10 +116,11 @@ class TabContent(QWidget):
         self.text_editor.setObjectName("TabTextEditor")
         
         # ============= 箭头按钮列表 =============
-        self.button_list_widget = QWidget()
+        self.button_list_widget = QFrame()
         self.button_list_widget.setMinimumHeight(60)  # 设置固定高度
+        self.button_list_widget.setFrameStyle(QFrame.StyledPanel | QFrame.Plain)  # 设置qt-material主题默认边框
         self.button_list_layout = QHBoxLayout(self.button_list_widget)
-        self.button_list_layout.setContentsMargins(10, 5, 10, 0)  # 取消下边距
+        self.button_list_layout.setContentsMargins(10, 5, 10, 0)  # 右侧间隙10px
         self.button_list_layout.setSpacing(5)
         self.button_list_layout.setAlignment(Qt.AlignLeft)  # 靠左对齐
         

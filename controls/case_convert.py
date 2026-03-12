@@ -45,7 +45,7 @@ class CaseConvertControl(BaseControl):
         self.mode_combo.addItems([
             "全部大写",
             "全部小写",
-            "首字母大写",
+            "段落首字母大写",
             "每个单词首字母大写"
         ])
         self.mode_combo.setCurrentIndex(0)

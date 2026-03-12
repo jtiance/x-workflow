@@ -66,7 +66,7 @@ class TextEditor(QWidget):
         """
         # 创建主布局
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 15, 10, 0)  # 上边距15px，右边距10px
+        layout.setContentsMargins(0, 15, 0, 0)  # 上边距15px，右边距0px
         layout.setSpacing(0)
         
         # 创建文本编辑框

@@ -70,13 +70,44 @@ class ControlPanel(QWidget):
         toolbar_layout.setContentsMargins(5, 5, 5, 5)
         toolbar_layout.setSpacing(2)
         
+        # 添加按钮
+        self.add_button = QPushButton("✨")
+        self.add_button.setToolTip("添加控件")
+        self.add_button.setMinimumSize(50, 40)
+        self.add_button.setMaximumSize(50, 40)
+        self.add_button.setObjectName("AddControlButton")
+        self.add_button.setStyleSheet("""
+            QPushButton {
+                font-size: 18px;
+                border: none;
+                background: transparent;
+                color: #4ade80;
+            }
+            QPushButton:hover {
+                background: rgba(74, 222, 128, 0.2);
+                border-radius: 4px;
+            }
+        """)
+        self.add_button.clicked.connect(self.add_control_requested.emit)
+        
         # 保存按钮（图标）
         self.save_button = QPushButton("💾")
         self.save_button.setToolTip("保存/更新")
         self.save_button.setMinimumSize(50, 40)
         self.save_button.setMaximumSize(50, 40)
         self.save_button.setObjectName("SaveButton")
-        self.save_button.setStyleSheet("QPushButton { font-size: 20px; border: none; background: transparent; }")
+        self.save_button.setStyleSheet("""
+            QPushButton {
+                font-size: 18px;
+                border: none;
+                background: transparent;
+                color: #4ade80;
+            }
+            QPushButton:hover {
+                background: rgba(74, 222, 128, 0.2);
+                border-radius: 4px;
+            }
+        """)
         self.save_button.clicked.connect(self.save_requested.emit)
         
         # 管理流程按钮（图标）
@@ -85,10 +116,22 @@ class ControlPanel(QWidget):
         self.load_button.setMinimumSize(50, 40)
         self.load_button.setMaximumSize(50, 40)
         self.load_button.setObjectName("LoadButton")
-        self.load_button.setStyleSheet("QPushButton { font-size: 20px; border: none; background: transparent; }")
+        self.load_button.setStyleSheet("""
+            QPushButton {
+                font-size: 18px;
+                border: none;
+                background: transparent;
+                color: #4ade80;
+            }
+            QPushButton:hover {
+                background: rgba(74, 222, 128, 0.2);
+                border-radius: 4px;
+            }
+        """)
         self.load_button.clicked.connect(self.load_requested.emit)
         
         toolbar_layout.addStretch()
+        toolbar_layout.addWidget(self.add_button)
         toolbar_layout.addWidget(self.save_button)
         toolbar_layout.addWidget(self.load_button)
         
@@ -116,13 +159,6 @@ class ControlPanel(QWidget):
         button_layout.setContentsMargins(0, 0, 0, 0)
         button_layout.setSpacing(5)
         
-        # 创建添加按钮
-        self.add_button = QPushButton("添加")
-        self.add_button.setMinimumHeight(50)  # 设置最小高度为50
-        self.add_button.setMinimumWidth(60)  # 设置最小宽度，更窄
-        self.add_button.setObjectName("AddControlButton")
-        self.add_button.clicked.connect(self.add_control_requested.emit)
-        
         # 创建执行按钮
         self.run_button = QPushButton("执行")
         self.run_button.setMinimumHeight(50)  # 设置最小高度为50
@@ -132,7 +168,6 @@ class ControlPanel(QWidget):
         
         # 添加按钮到布局（左侧固定10px间距，按钮可拉伸）
         button_layout.addSpacing(10)
-        button_layout.addWidget(self.add_button, 1)  # 伸展因子1
         button_layout.addWidget(self.run_button, 1)  # 伸展因子1
         
         # 将工具栏、滚动区域和按钮区域添加到主布局
