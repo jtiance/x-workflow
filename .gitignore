@@ -1,1 +1,4 @@
 .idea/
+.trae/
+__pycache__/
+*.pyc

@@ -11,6 +11,7 @@ from PySide6.QtCore import Qt, Signal
 from widgets.control_panel import ControlPanel
 from widgets.text_editor import TextEditor
 from widgets.workflow_dialogs import SaveWorkflowDialog, WorkflowManagerDialog
+from widgets.arrow_button import ArrowButton
 from workflow_manager import get_workflow_manager
 
 
@@ -39,6 +40,15 @@ class TabContent(QWidget):
         
         # 当前标签页名称
         self._current_tab_name = "[未命名]"
+        
+        # 文本缓存列表（保存每个控件执行后的文本）
+        self._text_cache = []
+        
+        # 箭头按钮列表
+        self._arrow_buttons = []
+        
+        # 当前选中的按钮索引
+        self._selected_button_index = -1
         
         # 初始化 UI
         self._init_ui()
@@ -87,6 +97,12 @@ class TabContent(QWidget):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         
+        # 创建右侧容器（包含文本编辑器和按钮列表）
+        right_container = QWidget()
+        right_layout = QVBoxLayout(right_container)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(15)  # 设置间距，让按钮区域和文本框拉开距离
+        
         # 创建分割器，左右分隔
         splitter = QSplitter(Qt.Horizontal)
         splitter.setObjectName("TabSplitter")
@@ -99,9 +115,21 @@ class TabContent(QWidget):
         self.text_editor = TextEditor()
         self.text_editor.setObjectName("TabTextEditor")
         
+        # ============= 箭头按钮列表 =============
+        self.button_list_widget = QWidget()
+        self.button_list_widget.setMinimumHeight(60)  # 设置固定高度
+        self.button_list_layout = QHBoxLayout(self.button_list_widget)
+        self.button_list_layout.setContentsMargins(10, 5, 10, 0)  # 取消下边距
+        self.button_list_layout.setSpacing(5)
+        self.button_list_layout.setAlignment(Qt.AlignLeft)  # 靠左对齐
+        
+        # 将文本编辑器和按钮列表添加到右侧容器
+        right_layout.addWidget(self.text_editor, 1)  # 文本编辑器占剩余空间
+        right_layout.addWidget(self.button_list_widget)  # 按钮列表
+        
         # 将两侧添加到分割器
         splitter.addWidget(self.control_panel)
-        splitter.addWidget(self.text_editor)
+        splitter.addWidget(right_container)
         splitter.setStretchFactor(0, 1)  # 左侧占1份（10%）
         splitter.setStretchFactor(1, 9)  # 右侧占9份（90%）
         
@@ -141,11 +169,16 @@ class TabContent(QWidget):
         按顺序执行所有控件（跳过被禁用的控件）
         """
         try:
-            # 获取当前文本
-            current_text = self.text_editor.get_text()
+            # 获取当前文本（原始文本）
+            original_text = self.text_editor.get_text()
+            
+            # 清空文本缓存
+            self._text_cache = []
+            # 保存原始文本作为第一个缓存
+            self._text_cache.append(original_text)
             
             # 按顺序执行所有控件（跳过被禁用的）
-            result_text = current_text
+            result_text = original_text
             for control in self.control_panel.get_controls():
                 # 检查控件是否被禁用
                 if hasattr(control, 'is_disabled') and control.is_disabled():
@@ -154,9 +187,18 @@ class TabContent(QWidget):
                 # 检查控件是否有 execute 方法
                 if hasattr(control, 'execute'):
                     result_text = control.execute(result_text)
+                    # 保存每个控件执行后的文本
+                    self._text_cache.append(result_text)
             
-            # 更新文本编辑器
+            # 更新文本编辑器（显示最终结果）
             self.text_editor.set_text(result_text)
+            
+            # 更新箭头按钮列表
+            self._update_arrow_buttons()
+            
+            # 选中最新的按钮（最后一个）
+            if self._arrow_buttons:
+                self._select_button(len(self._arrow_buttons) - 1)
             
             # 显示成功状态
             self.set_status("执行完成", is_error=False)
@@ -167,6 +209,75 @@ class TabContent(QWidget):
             # 其他错误
             error_msg = str(e)
             self.set_status(f"执行出错: {error_msg}", is_error=True)
+    
+    def _update_arrow_buttons(self):
+        """
+        更新箭头按钮列表
+        """
+        # 清空现有按钮（保留布局）
+        while self.button_list_layout.count():
+            item = self.button_list_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        self._arrow_buttons.clear()
+        
+        # 获取所有控件（不包括被禁用的）
+        controls = self.control_panel.get_controls()
+        enabled_controls = [c for c in controls if not (hasattr(c, 'is_disabled') and c.is_disabled())]
+        
+        # 创建按钮：第一个显示原始文本，后续显示每个控件的标题
+        # 按钮数量 = 启用控件数量 + 1
+        button_count = len(enabled_controls) + 1
+        
+        for i in range(button_count):
+            if i == 0:
+                # 第一个按钮显示原始文本
+                button_text = "原始文本"
+            else:
+                # 后续按钮显示控件标题
+                control = enabled_controls[i - 1]
+                button_text = control.get_title() if hasattr(control, 'get_title') else f"步骤{i}"
+            
+            button = ArrowButton(button_text)
+            button.setMinimumWidth(80)
+            button.clicked.connect(lambda checked, index=i: self._on_arrow_button_clicked(index))
+            
+            self._arrow_buttons.append(button)
+            self.button_list_layout.addWidget(button)
+        
+        # 不再添加弹性空间，确保按钮靠左对齐
+    
+    def _on_arrow_button_clicked(self, index):
+        """
+        当点击箭头按钮时调用
+        
+        Args:
+            index: 按钮索引
+        """
+        # 选中新按钮
+        self._select_button(index)
+        
+        # 显示对应索引的文本
+        if 0 <= index < len(self._text_cache):
+            self.text_editor.set_text(self._text_cache[index])
+            self.set_status(f"显示步骤 {index} 的结果", is_error=False)
+    
+    def _select_button(self, index):
+        """
+        选中指定索引的按钮
+        
+        Args:
+            index: 按钮索引
+        """
+        # 取消之前选中的按钮
+        if 0 <= self._selected_button_index < len(self._arrow_buttons):
+            self._arrow_buttons[self._selected_button_index].set_selected(False)
+        
+        # 选中新按钮
+        self._selected_button_index = index
+        if 0 <= index < len(self._arrow_buttons):
+            self._arrow_buttons[index].set_selected(True)
             
     def _on_load_clicked(self):
         """
