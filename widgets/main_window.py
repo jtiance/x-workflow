@@ -126,17 +126,21 @@ class MainWindow(QMainWindow):
         # 查看菜单
         view_menu = menubar.addMenu("查看(&V)")
         
+        # 字体子菜单
+        font_menu = QMenu("字体(&F)", self)
+        view_menu.addMenu(font_menu)
+        
         # 放大字号动作
         zoom_in_action = QAction("放大文本字号(&I)", self)
         zoom_in_action.setShortcut("Ctrl+=")
         zoom_in_action.triggered.connect(self._zoom_in_text)
-        view_menu.addAction(zoom_in_action)
+        font_menu.addAction(zoom_in_action)
         
         # 缩小字号动作
         zoom_out_action = QAction("缩小文本字号(&O)", self)
         zoom_out_action.setShortcut("Ctrl+-")
         zoom_out_action.triggered.connect(self._zoom_out_text)
-        view_menu.addAction(zoom_out_action)
+        font_menu.addAction(zoom_out_action)
         
         # 帮助菜单
         help_menu = menubar.addMenu("帮助(&H)")
