@@ -123,6 +123,21 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
         
+        # 查看菜单
+        view_menu = menubar.addMenu("查看(&V)")
+        
+        # 放大字号动作
+        zoom_in_action = QAction("放大文本字号(&I)", self)
+        zoom_in_action.setShortcut("Ctrl+=")
+        zoom_in_action.triggered.connect(self._zoom_in_text)
+        view_menu.addAction(zoom_in_action)
+        
+        # 缩小字号动作
+        zoom_out_action = QAction("缩小文本字号(&O)", self)
+        zoom_out_action.setShortcut("Ctrl+-")
+        zoom_out_action.triggered.connect(self._zoom_out_text)
+        view_menu.addAction(zoom_out_action)
+        
         # 帮助菜单
         help_menu = menubar.addMenu("帮助(&H)")
         
@@ -352,6 +367,32 @@ class MainWindow(QMainWindow):
             self,
             "关于 X-Workflow",
             "X-Workflow\n\n"
-            "一个基于 PySide6 和 qt-material 的可视化流程编辑器。\n\n"
-            "版本: 1.0.0"
+            "一个可视化的文本处理工作流工具\n"
+            "基于 PySide6 开发"
         )
+    
+    def _zoom_in_text(self):
+        """
+        放大当前标签页的文本字号
+        """
+        # 获取当前标签页
+        current_index = self.tab_widget.currentIndex()
+        if current_index >= 0:
+            tab_content = self.tab_widget.widget(current_index)
+            if tab_content:
+                text_editor = tab_content.get_text_editor()
+                if text_editor:
+                    text_editor.zoom_in()
+    
+    def _zoom_out_text(self):
+        """
+        缩小当前标签页的文本字号
+        """
+        # 获取当前标签页
+        current_index = self.tab_widget.currentIndex()
+        if current_index >= 0:
+            tab_content = self.tab_widget.widget(current_index)
+            if tab_content:
+                text_editor = tab_content.get_text_editor()
+                if text_editor:
+                    text_editor.zoom_out()

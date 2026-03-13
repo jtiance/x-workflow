@@ -141,6 +141,27 @@ class TextEditor(QWidget):
         清空文本内容
         """
         self.text_edit.clear()
+    
+    def zoom_in(self):
+        """
+        放大字体
+        """
+        self.text_edit.zoom_in()
+    
+    def zoom_out(self):
+        """
+        缩小字体
+        """
+        self.text_edit.zoom_out()
+    
+    def get_font_size(self):
+        """
+        获取当前字体大小
+        
+        Returns:
+            int: 字体大小
+        """
+        return self.text_edit.get_font_size()
 
 
 class CodeEditor(QPlainTextEdit):
@@ -170,6 +191,9 @@ class CodeEditor(QPlainTextEdit):
         
         # 初始高亮当前行
         self.highlight_current_line()
+        
+        # 字体大小
+        self._font_size = 14
         
     def line_number_area_width(self):
         """
@@ -271,3 +295,36 @@ class CodeEditor(QPlainTextEdit):
             extra_selections.append(selection)
             
         self.setExtraSelections(extra_selections)
+    
+    def zoom_in(self):
+        """
+        放大字体
+        """
+        self._font_size += 2
+        if self._font_size > 72:
+            self._font_size = 72
+        font = self.font()
+        font.setPointSize(self._font_size)
+        self.setFont(font)
+        self.update_line_number_area_width(0)
+    
+    def zoom_out(self):
+        """
+        缩小字体
+        """
+        self._font_size -= 2
+        if self._font_size < 8:
+            self._font_size = 8
+        font = self.font()
+        font.setPointSize(self._font_size)
+        self.setFont(font)
+        self.update_line_number_area_width(0)
+    
+    def get_font_size(self):
+        """
+        获取当前字体大小
+        
+        Returns:
+            int: 字体大小
+        """
+        return self._font_size
