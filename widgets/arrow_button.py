@@ -130,23 +130,33 @@ class ArrowButton(QPushButton):
         # 计算矩形部分的宽度
         rect_width = self.width() - arrow_width
         
+        # 圆角半径
+        corner_radius = 3
+        
         # 创建五边形路径
         path = QPainterPath()
         
-        # 左上角
-        path.moveTo(5, 0)
-        # 右上角（矩形部分）
-        path.lineTo(rect_width - 5, 0)
-        # 箭头起点
-        path.lineTo(rect_width, 0)
-        # 箭头尖端
-        path.lineTo(self.width() - 2, self.height() / 2)
-        # 箭头终点
-        path.lineTo(rect_width, self.height())
-        # 右下角（矩形部分）
-        path.lineTo(rect_width - 5, self.height())
-        # 左下角
-        path.lineTo(5, self.height())
+        # 1. 左上角 - 圆角
+        path.moveTo(corner_radius, 0)
+        path.arcTo(0, 0, corner_radius * 2, corner_radius * 2, 90, 90)
+        
+        # 2. 左下角 - 圆角
+        path.lineTo(0, self.height() - corner_radius)
+        path.arcTo(0, self.height() - corner_radius * 2, corner_radius * 2, corner_radius * 2, 180, 90)
+        
+        # 3. 右下角 - 圆角
+        path.lineTo(rect_width - corner_radius, self.height())
+        path.arcTo(rect_width - corner_radius * 2, self.height() - corner_radius * 2, corner_radius * 2, corner_radius * 2, 270, 90)
+        
+        # 4. 到箭头尖端 - 保持尖角
+        tip_x = self.width() - 2
+        tip_y = self.height() / 2
+        path.lineTo(tip_x, tip_y)
+        
+        # 5. 右上角 - 圆角
+        path.lineTo(rect_width, corner_radius)
+        path.arcTo(rect_width - corner_radius * 2, 0, corner_radius * 2, corner_radius * 2, 0, 90)
+        
         # 闭合路径
         path.closeSubpath()
         

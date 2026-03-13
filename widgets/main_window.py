@@ -327,6 +327,13 @@ class MainWindow(QMainWindow):
             # 添加到标签页
             tab_content.add_control(control)
             
+        elif control_type == "json_compress":
+            # 创建JSON压缩控件
+            from controls.json_compress import JsonCompressControl
+            control = JsonCompressControl()
+            # 添加到标签页
+            tab_content.add_control(control)
+            
         elif control_type == "add_text":
             # 创建增加文本控件
             from controls.add_text import AddTextControl
@@ -372,7 +379,7 @@ class MainWindow(QMainWindow):
             "关于 X-Workflow",
             "X-Workflow\n\n"
             "一个可视化的文本处理工作流工具\n"
-            "基于 PySide6 开发"
+            "基于 PySide6和qt-material 开发"
         )
     
     def _zoom_in_text(self):

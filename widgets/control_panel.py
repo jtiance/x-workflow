@@ -268,6 +268,7 @@ class ControlPanel(QWidget):
         # 根据配置创建控件
         from controls.text_replace import TextReplaceControl
         from controls.json_format import JsonFormatControl
+        from controls.json_compress import JsonCompressControl
         from controls.add_text import AddTextControl
         from controls.case_convert import CaseConvertControl
         from controls.text_split import TextSplitControl
@@ -283,6 +284,10 @@ class ControlPanel(QWidget):
                 self.add_control(control)
             elif control_type == "json_format":
                 control = JsonFormatControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "json_compress":
+                control = JsonCompressControl()
                 control.load_config(config)
                 self.add_control(control)
             elif control_type == "add_text":

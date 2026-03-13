@@ -143,6 +143,7 @@ class ControlDialog(QDialog):
         controls = [
             ("文本替换", "text_replace"),
             ("JSON格式化", "json_format"),
+            ("JSON压缩", "json_compress"),
             ("增加文本", "add_text"),
             ("大小写转换", "case_convert"),
             ("文本分割", "text_split"),
@@ -236,6 +237,24 @@ class ControlDialog(QDialog):
             
             # 设置一些示例数据
             preview_control.set_indent(4)
+            preview_control.set_sort_keys(True)
+            
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+            
+        elif control_type == "json_compress":
+            # JSON压缩控件预览
+            from controls.json_compress import JsonCompressControl
+            
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = JsonCompressControl()
+            preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+            
+            # 设置一些示例数据
             preview_control.set_sort_keys(True)
             
             # 添加到预览区域
