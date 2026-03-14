@@ -40,6 +40,7 @@ class AddTextControl(BaseControl):
         # 第1行：操作类型
         type_label = QLabel("操作类型:")
         type_label.setMinimumWidth(70)
+        type_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.type_combo = QComboBox()
         self.type_combo.addItems(["增加前缀", "增加后缀", "增加前后缀"])
@@ -52,6 +53,7 @@ class AddTextControl(BaseControl):
         # 第2行：文本
         text_label = QLabel("文本:")
         text_label.setMinimumWidth(70)
+        text_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.text_input = QLineEdit()
         self.text_input.setPlaceholderText("输入要添加的文本...")

@@ -40,6 +40,7 @@ class AddPrefixControl(BaseControl):
         # 第1行：前缀
         prefix_label = QLabel("前缀:")
         prefix_label.setMinimumWidth(70)
+        prefix_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.prefix_input = QLineEdit()
         self.prefix_input.setPlaceholderText("输入要添加的前缀...")

@@ -5,8 +5,8 @@
 """
 
 import re
-from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QCheckBox, QSizePolicy
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QCheckBox, QSizePolicy
 
 from controls.base_control import BaseControl
 
@@ -41,6 +41,7 @@ class TextReplaceControl(BaseControl):
         # 第1行：查找
         find_label = QLabel("查找:")
         find_label.setMinimumWidth(70)
+        find_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.find_input = QLineEdit()
         self.find_input.setPlaceholderText("输入要查找的文本...")
@@ -53,6 +54,7 @@ class TextReplaceControl(BaseControl):
         # 第2行：替换
         replace_label = QLabel("替换:")
         replace_label.setMinimumWidth(70)
+        replace_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.replace_input = QLineEdit()
         self.replace_input.setPlaceholderText("输入替换后的文本...")
@@ -63,16 +65,16 @@ class TextReplaceControl(BaseControl):
         grid_layout.addWidget(self.replace_input, 1, 1)
         
         # 第3行：查找选项（复选框）
+        self.case_checkbox = QCheckBox("忽略大小写")
+        self.case_checkbox.setChecked(False)
+        self.case_checkbox.stateChanged.connect(self._emit_parameters_changed)
+
         self.regex_checkbox = QCheckBox("使用正则表达式")
         self.regex_checkbox.setChecked(False)
         self.regex_checkbox.stateChanged.connect(self._emit_parameters_changed)
         
-        self.case_checkbox = QCheckBox("忽略大小写")
-        self.case_checkbox.setChecked(False)
-        self.case_checkbox.stateChanged.connect(self._emit_parameters_changed)
-        
-        grid_layout.addWidget(self.regex_checkbox, 2, 0)
-        grid_layout.addWidget(self.case_checkbox, 2, 1)
+        grid_layout.addWidget(self.case_checkbox, 2, 0)
+        grid_layout.addWidget(self.regex_checkbox, 2, 1)
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)

@@ -40,6 +40,7 @@ class CaseConvertControl(BaseControl):
         # 第1行：转换模式
         mode_label = QLabel("转换为:")
         mode_label.setMinimumWidth(70)
+        mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.mode_combo = QComboBox()
         self.mode_combo.addItems([

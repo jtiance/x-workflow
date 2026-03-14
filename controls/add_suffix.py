@@ -40,6 +40,7 @@ class AddSuffixControl(BaseControl):
         # 第1行：后缀
         suffix_label = QLabel("后缀:")
         suffix_label.setMinimumWidth(70)
+        suffix_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.suffix_input = QLineEdit()
         self.suffix_input.setPlaceholderText("输入要添加的后缀...")

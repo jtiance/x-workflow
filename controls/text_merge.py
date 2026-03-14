@@ -51,6 +51,7 @@ class TextMergeControl(BaseControl):
         # 第1行：连接符
         join_label = QLabel("连接符:")
         join_label.setMinimumWidth(70)
+        join_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.join_combo = QComboBox()
         self.join_combo.setEditable(False)

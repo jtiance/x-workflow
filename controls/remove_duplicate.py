@@ -38,6 +38,7 @@ class RemoveDuplicateControl(BaseControl):
         
         mode_label = QLabel("模式:")
         mode_label.setMinimumWidth(70)
+        mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.mode_combo = QComboBox()
         self.mode_combo.addItems(["保留首次出现", "保留最后一次出现"])
@@ -49,6 +50,7 @@ class RemoveDuplicateControl(BaseControl):
         
         ignore_case_label = QLabel("忽略大小写:")
         ignore_case_label.setMinimumWidth(70)
+        ignore_case_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.ignore_case_check = QCheckBox()
         self.ignore_case_check.stateChanged.connect(self._emit_parameters_changed)
@@ -59,6 +61,7 @@ class RemoveDuplicateControl(BaseControl):
         
         ignore_blank_label = QLabel("忽略空行:")
         ignore_blank_label.setMinimumWidth(70)
+        ignore_blank_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.ignore_blank_check = QCheckBox()
         self.ignore_blank_check.stateChanged.connect(self._emit_parameters_changed)

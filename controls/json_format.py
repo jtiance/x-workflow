@@ -41,6 +41,7 @@ class JsonFormatControl(BaseControl):
         # 第1行：缩进
         indent_label = QLabel("缩进:")
         indent_label.setMinimumWidth(70)
+        indent_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.indent_spin = QSpinBox()
         self.indent_spin.setMinimum(0)

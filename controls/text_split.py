@@ -41,6 +41,7 @@ class TextSplitControl(BaseControl):
         # 第1行：分割模式
         mode_label = QLabel("模式:")
         mode_label.setMinimumWidth(70)
+        mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.mode_combo = QComboBox()
         self.mode_combo.addItems(["按分隔符分割", "按长度分割"])
@@ -54,6 +55,7 @@ class TextSplitControl(BaseControl):
         # 第2行：分隔符
         delimiter_label = QLabel("分隔符:")
         delimiter_label.setMinimumWidth(70)
+        delimiter_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.delimiter_combo = QComboBox()
         self.delimiter_combo.setEditable(True)
@@ -68,6 +70,7 @@ class TextSplitControl(BaseControl):
         # 第3行：字符数
         length_label = QLabel("字符数:")
         length_label.setMinimumWidth(70)
+        length_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.length_spin = QSpinBox()
         self.length_spin.setMinimum(1)

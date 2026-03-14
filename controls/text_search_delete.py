@@ -41,6 +41,7 @@ class TextSearchDeleteControl(BaseControl):
         # 第1行：查询文本
         search_label = QLabel("查询文本:")
         search_label.setMinimumWidth(70)
+        search_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("输入要查询的文本...")
@@ -53,6 +54,7 @@ class TextSearchDeleteControl(BaseControl):
         # 第2行：匹配模式
         match_label = QLabel("匹配模式:")
         match_label.setMinimumWidth(70)
+        match_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.match_combo = QComboBox()
         self.match_combo.addItems(["包含文本", "不包含文本"])
@@ -65,6 +67,7 @@ class TextSearchDeleteControl(BaseControl):
         # 第3行：删除模式
         delete_label = QLabel("删除模式:")
         delete_label.setMinimumWidth(70)
+        delete_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.delete_combo = QComboBox()
         self.delete_combo.addItems(["删除匹配行", "删除非匹配行"])
