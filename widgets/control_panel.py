@@ -274,6 +274,7 @@ class ControlPanel(QWidget):
         from controls.text_split import TextSplitControl
         from controls.text_merge import TextMergeControl
         from controls.text_search_delete import TextSearchDeleteControl
+        from controls.remove_duplicate import RemoveDuplicateControl
         
         for config in configs:
             control_type = config.get("type")
@@ -308,6 +309,10 @@ class ControlPanel(QWidget):
                 self.add_control(control)
             elif control_type == "text_search_delete":
                 control = TextSearchDeleteControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "remove_duplicate":
+                control = RemoveDuplicateControl()
                 control.load_config(config)
                 self.add_control(control)
     

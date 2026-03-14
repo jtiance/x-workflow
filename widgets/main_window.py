@@ -369,6 +369,11 @@ class MainWindow(QMainWindow):
             # 添加到标签页
             tab_content.add_control(control)
             
+        elif control_type == "remove_duplicate":
+            from controls.remove_duplicate import RemoveDuplicateControl
+            control = RemoveDuplicateControl()
+            tab_content.add_control(control)
+            
     def _show_about(self):
         """
         显示关于对话框

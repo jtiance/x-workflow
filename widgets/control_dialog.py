@@ -149,6 +149,7 @@ class ControlDialog(QDialog):
             ("文本分割", "text_split"),
             ("文本合并", "text_merge"),
             ("文本搜索删除", "text_search_delete"),
+            ("移除重复行", "remove_duplicate"),
         ]
         
         # 添加到列表
@@ -344,6 +345,21 @@ class ControlDialog(QDialog):
             
             # 设置一些示例数据
             preview_control.set_search_text("test")
+            
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+            
+        elif control_type == "remove_duplicate":
+            # 移除重复行控件预览
+            from controls.remove_duplicate import RemoveDuplicateControl
+            
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = RemoveDuplicateControl()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
             
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)

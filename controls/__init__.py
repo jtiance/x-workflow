@@ -10,5 +10,6 @@ from .case_convert import CaseConvertControl
 from .text_split import TextSplitControl
 from .text_merge import TextMergeControl
 from .text_search_delete import TextSearchDeleteControl
+from .remove_duplicate import RemoveDuplicateControl
 
-__all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl']
+__all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl', 'RemoveDuplicateControl']
