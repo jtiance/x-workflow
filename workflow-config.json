@@ -1,0 +1,39 @@
+{
+  "JSON格式化": {
+    "name": "JSON格式化",
+    "controls": [
+      {
+        "type": "json_format",
+        "indent": 4,
+        "sort_keys": false,
+        "ensure_ascii": false
+      }
+    ]
+  },
+  "转sql in语句": {
+    "name": "转sql in语句",
+    "controls": [
+      {
+        "type": "add_text",
+        "operation_type": "增加前后缀",
+        "text": "'"
+      },
+      {
+        "type": "text_merge",
+        "separator": ",",
+        "trim_whitespace": true,
+        "filter_empty": true
+      },
+      {
+        "type": "add_text",
+        "operation_type": "增加前缀",
+        "text": "in ("
+      },
+      {
+        "type": "add_text",
+        "operation_type": "增加后缀",
+        "text": ")"
+      }
+    ]
+  }
+}

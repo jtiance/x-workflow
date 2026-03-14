@@ -14,9 +14,9 @@ from controls.base_control import BaseControl
 SEPARATOR_MAP = {
     "无": "",
     "空格": " ",
-    "逗号": ", ",
-    "分号": "; ",
-    "竖线": "| ",
+    "逗号": ",",
+    "分号": ";",
+    "竖线": "|",
     "自定义": None
 }
 

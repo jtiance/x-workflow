@@ -29,18 +29,7 @@ class WorkflowManager:
         self.configs: Dict[str, Dict[str, Any]] = {}
         
         # 初始化
-        self._init_work_dir()
         self._load_configs()
-        
-    def _init_work_dir(self):
-        """
-        初始化工作目录
-        如果不存在则创建
-        """
-        if not self.work_dir.exists():
-            self.work_dir.mkdir(parents=True, exist_ok=True)
-            print(f"已创建工作目录: {self.work_dir}")
-            
     def _load_configs(self):
         """
         从文件加载配置到内存
