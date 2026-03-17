@@ -75,7 +75,7 @@ class TextMergeControl(BaseControl):
         
         # 第3行：去除每行前后空白
         self.trim_checkbox = QCheckBox("去除每行前后空白")
-        self.trim_checkbox.setChecked(True)
+        self.trim_checkbox.setChecked(False)
         self.trim_checkbox.stateChanged.connect(self._emit_parameters_changed)
         
         grid_layout.addWidget(self.trim_checkbox, 2, 0, 1, 2)  # 跨两列
@@ -170,7 +170,7 @@ class TextMergeControl(BaseControl):
         self.join_combo.setCurrentText("换行")
         self.custom_separator_input.setText("")
         self.custom_separator_input.setVisible(False)
-        self.trim_checkbox.setChecked(True)
+        self.trim_checkbox.setChecked(False)
         self.filter_checkbox.setChecked(True)
         
     def get_config(self):
@@ -196,7 +196,7 @@ class TextMergeControl(BaseControl):
         """
         if config.get("type") == "text_merge":
             self.set_separator(config.get("separator", "\n"))
-            self.trim_checkbox.setChecked(config.get("trim_whitespace", True))
+            self.trim_checkbox.setChecked(config.get("trim_whitespace", False))
             self.filter_checkbox.setChecked(config.get("filter_empty", True))
             
     def get_control_type(self):
