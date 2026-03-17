@@ -193,7 +193,11 @@ class CodeEditor(QPlainTextEdit):
         self.highlight_current_line()
         
         # 字体大小
-        self._font_size = 14
+        self._font_size = 16
+        font = self.font()
+        font.setPointSize(self._font_size)
+        self.setFont(font)
+        self.update_line_number_area_width(0)
         
     def line_number_area_width(self):
         """

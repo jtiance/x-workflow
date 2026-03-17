@@ -39,7 +39,7 @@ class TabContent(QWidget):
         self.setObjectName("TabContent")
         
         # 当前标签页名称
-        self._current_tab_name = "[未命名]"
+        self._current_tab_name = "未命名"
         
         # 文本缓存列表（保存每个控件执行后的文本）
         self._text_cache = []
@@ -83,7 +83,7 @@ class TabContent(QWidget):
         """
         根据当前标签名称更新保存按钮文本
         """
-        if self._current_tab_name != "[未命名]":
+        if self._current_tab_name != "未命名":
             self.control_panel.set_save_button_text("更新")
         else:
             self.control_panel.set_save_button_text("保存")
@@ -395,7 +395,7 @@ class TabContent(QWidget):
         """
         current_name = self.get_current_tab_name()
         
-        if current_name != "[未命名]":
+        if current_name != "未命名":
             # 已保存的流程，显示确认对话框
             from PySide6.QtWidgets import QMessageBox, QPushButton
             

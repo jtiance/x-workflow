@@ -59,29 +59,9 @@ class MainWindow(QMainWindow):
         # ============= 创建标签页控件 =============
         self.tab_widget = QTabWidget()
         self.tab_widget.setTabsClosable(True)  # 标签可关闭
-        self.tab_widget.setMovable(True)  # 标签可拖动
-        self.tab_widget.setDocumentMode(True)  # 文档模式
+        self.tab_widget.setMovable(True)
+        self.tab_widget.setUsesScrollButtons(True)  # 标签过多时显示滚动按钮
         self.tab_widget.setObjectName("MainTabWidget")
-        
-        # 设置标签栏样式，只影响标签头部，不影响子控件
-        self.tab_widget.tabBar().setStyleSheet("""
-            QTabBar::tab {
-                background: #2b2b2b;
-                border: 1px solid #3c3f41;
-                border-bottom: none;
-                padding: 4px 12px;
-                margin-right: 2px;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-            }
-            QTabBar::tab:selected {
-                background: #3c3f41;
-                border-bottom: 1px solid #3c3f41;
-            }
-            QTabBar::tab:hover {
-                background: #36393b;
-            }
-        """)
         
         # 连接标签页关闭信号
         self.tab_widget.tabCloseRequested.connect(self._on_tab_close_requested)
@@ -187,7 +167,7 @@ class MainWindow(QMainWindow):
         if workflow_name:
             tab_title = workflow_name
         else:
-            tab_title = "[未命名]"
+            tab_title = "未命名"
         
         # 设置 TabContent 的初始名称
         tab_content.set_current_tab_name(tab_title)

@@ -19,7 +19,7 @@ class SaveWorkflowDialog(QDialog):
     # 定义信号：当用户确认保存时发出
     save_confirmed = Signal(str)  # 流程名称
     
-    def __init__(self, existing_names, current_name="[未命名]", parent=None):
+    def __init__(self, existing_names, current_name="未命名", parent=None):
         """
         初始化保存对话框
         
@@ -51,7 +51,7 @@ class SaveWorkflowDialog(QDialog):
         main_layout.setSpacing(15)
         
         # 输入标签
-        if self.current_name != "[未命名]":
+        if self.current_name != "未命名":
             label = QLabel(f"更新流程 '{self.current_name}':")
         else:
             label = QLabel("请输入流程名称:")
@@ -63,8 +63,8 @@ class SaveWorkflowDialog(QDialog):
         self.name_input.setObjectName("WorkflowNameInput")
         self.name_input.textChanged.connect(self._on_text_changed)
         
-        # 如果当前标签名不是"[未命名]"，则自动填充
-        if self.current_name != "[未命名]":
+        # 如果当前标签名不是"未命名"，则自动填充
+        if self.current_name != "未命名":
             self.name_input.setText(self.current_name)
         
         # 按钮区域
@@ -104,9 +104,9 @@ class SaveWorkflowDialog(QDialog):
         # 检查是否有内容
         has_content = bool(name)
         
-        # 检查是否重复（如果当前标签名不是"[未命名]"，且输入的是当前名称，则允许）
+        # 检查是否重复（如果当前标签名不是"未命名"，且输入的是当前名称，则允许）
         is_duplicate = name in self.existing_names
-        is_updating_current = (self.current_name != "[未命名]") and (name == self.current_name)
+        is_updating_current = (self.current_name != "未命名") and (name == self.current_name)
         
         # 启用/禁用确定按钮
         self.ok_button.setEnabled(has_content and (not is_duplicate or is_updating_current))
@@ -122,9 +122,9 @@ class SaveWorkflowDialog(QDialog):
             QMessageBox.warning(self, "警告", "流程名称不能为空！")
             return
             
-        # 检查是否重复（如果当前标签名不是"[未命名]"，且输入的是当前名称，则允许）
+        # 检查是否重复（如果当前标签名不是"未命名"，且输入的是当前名称，则允许）
         is_duplicate = name in self.existing_names
-        is_updating_current = (self.current_name != "[未命名]") and (name == self.current_name)
+        is_updating_current = (self.current_name != "未命名") and (name == self.current_name)
         
         if is_duplicate and not is_updating_current:
             QMessageBox.warning(self, "警告", "该流程名称已存在！")
