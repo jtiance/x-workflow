@@ -373,6 +373,10 @@ class MainWindow(QMainWindow):
             from controls.remove_duplicate import RemoveDuplicateControl
             control = RemoveDuplicateControl()
             tab_content.add_control(control)
+        elif control_type == "remove_empty_lines":
+            from controls.remove_empty_lines import RemoveEmptyLinesControl
+            control = RemoveEmptyLinesControl()
+            tab_content.add_control(control)
             
     def _show_about(self):
         """
