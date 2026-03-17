@@ -151,6 +151,7 @@ class ControlDialog(QDialog):
             ("文本搜索删除", "text_search_delete"),
             ("移除重复行", "remove_duplicate"),
             ("移除空行", "remove_empty_lines"),
+            ("文本裁剪", "text_trim"),
         ]
         
         # 添加到列表
@@ -376,6 +377,24 @@ class ControlDialog(QDialog):
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
+            
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+            
+        elif control_type == "text_trim":
+            # 文本裁剪控件预览
+            from controls.text_trim import TextTrimControl
+            
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = TextTrimControl()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+            
+            # 设置一些示例数据
+            preview_control.match_edit.setText("test")
             
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)

@@ -377,6 +377,10 @@ class MainWindow(QMainWindow):
             from controls.remove_empty_lines import RemoveEmptyLinesControl
             control = RemoveEmptyLinesControl()
             tab_content.add_control(control)
+        elif control_type == "text_trim":
+            from controls.text_trim import TextTrimControl
+            control = TextTrimControl()
+            tab_content.add_control(control)
             
     def _show_about(self):
         """

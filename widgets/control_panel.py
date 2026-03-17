@@ -276,6 +276,7 @@ class ControlPanel(QWidget):
         from controls.text_search_delete import TextSearchDeleteControl
         from controls.remove_duplicate import RemoveDuplicateControl
         from controls.remove_empty_lines import RemoveEmptyLinesControl
+        from controls.text_trim import TextTrimControl
         
         for config in configs:
             control_type = config.get("type")
@@ -318,6 +319,10 @@ class ControlPanel(QWidget):
                 self.add_control(control)
             elif control_type == "remove_empty_lines":
                 control = RemoveEmptyLinesControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "text_trim":
+                control = TextTrimControl()
                 control.load_config(config)
                 self.add_control(control)
     
