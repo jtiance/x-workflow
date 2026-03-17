@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
     QLineEdit, QListWidget, QPushButton, QMessageBox
 )
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Signal
 
 
 class SaveWorkflowDialog(QDialog):
@@ -32,10 +32,11 @@ class SaveWorkflowDialog(QDialog):
         
         self.existing_names = existing_names
         self.current_name = current_name
+        self.is_updating = current_name != "未命名"
         
         # 设置对话框属性
         self.setWindowTitle("保存流程")
-        self.setMinimumSize(400, 150)
+        self.setMinimumSize(400, 180)
         self.setObjectName("SaveWorkflowDialog")
         
         # 初始化 UI
@@ -50,51 +51,87 @@ class SaveWorkflowDialog(QDialog):
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(15)
         
-        # 输入标签
-        if self.current_name != "未命名":
-            label = QLabel(f"更新流程 '{self.current_name}':")
+        if self.is_updating:
+            # 更新模式：只显示确认界面
+            label = QLabel(f"确定要更新流程 '{self.current_name}' 吗？")
+            label.setObjectName("SaveDialogLabel")
+            # label.setAlignment(Qt.AlignCenter)
+            
+            # 按钮区域
+            button_layout = QHBoxLayout()
+            button_layout.addStretch()
+            
+            # 另存为按钮
+            self.save_as_button = QPushButton("另存为")
+            self.save_as_button.setObjectName("SaveAsButton")
+            self.save_as_button.clicked.connect(self._on_save_as_clicked)
+            button_layout.addWidget(self.save_as_button)
+            
+            # 覆盖按钮
+            self.ok_button = QPushButton("覆盖")
+            self.ok_button.setObjectName("SaveOkButton")
+            self.ok_button.clicked.connect(self._on_ok_clicked)
+            button_layout.addWidget(self.ok_button)
+            
+            # 取消按钮
+            self.cancel_button = QPushButton("取消")
+            self.cancel_button.setObjectName("SaveCancelButton")
+            self.cancel_button.clicked.connect(self.reject)
+            button_layout.addWidget(self.cancel_button)
+            
+            # 将所有组件添加到主布局
+            main_layout.addWidget(label)
+            main_layout.addLayout(button_layout)
         else:
+            # 保存模式：显示输入框
             label = QLabel("请输入流程名称:")
-        label.setObjectName("SaveDialogLabel")
-        
-        # 名称输入框
-        self.name_input = QLineEdit()
-        self.name_input.setPlaceholderText("输入流程名称...")
-        self.name_input.setObjectName("WorkflowNameInput")
-        self.name_input.textChanged.connect(self._on_text_changed)
-        
-        # 如果当前标签名不是"未命名"，则自动填充
-        if self.current_name != "未命名":
-            self.name_input.setText(self.current_name)
-        
-        # 按钮区域
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        
-        # 确定按钮
-        self.ok_button = QPushButton("确定")
-        self.ok_button.setObjectName("SaveOkButton")
-        self.ok_button.clicked.connect(self._on_ok_clicked)
-        self.ok_button.setEnabled(False)  # 初始禁用
-        
-        # 取消按钮
-        self.cancel_button = QPushButton("取消")
-        self.cancel_button.setObjectName("SaveCancelButton")
-        self.cancel_button.clicked.connect(self.reject)
-        
-        # 添加按钮
-        button_layout.addWidget(self.ok_button)
-        button_layout.addWidget(self.cancel_button)
-        
-        # 将所有组件添加到主布局
-        main_layout.addWidget(label)
-        main_layout.addWidget(self.name_input)
-        main_layout.addLayout(button_layout)
+            label.setObjectName("SaveDialogLabel")
+            
+            # 名称输入框
+            self.name_input = QLineEdit()
+            self.name_input.setPlaceholderText("输入流程名称...")
+            self.name_input.setObjectName("WorkflowNameInput")
+            self.name_input.textChanged.connect(self._on_text_changed)
+            
+            # 错误提示 label
+            self.error_label = QLabel()
+            self.error_label.setStyleSheet("color: #ff6b6b;")
+            self.error_label.setMinimumHeight(20)
+            self.error_label.setText("")
+            
+            # 按钮区域
+            button_layout = QHBoxLayout()
+            button_layout.addStretch()
+            
+            # 确定按钮
+            self.ok_button = QPushButton("确定")
+            self.ok_button.setObjectName("SaveOkButton")
+            self.ok_button.clicked.connect(self._on_ok_clicked)
+            self.ok_button.setEnabled(False)
+            
+            # 取消按钮
+            self.cancel_button = QPushButton("取消")
+            self.cancel_button.setObjectName("SaveCancelButton")
+            self.cancel_button.clicked.connect(self.reject)
+            
+            # 添加按钮
+            button_layout.addWidget(self.ok_button)
+            button_layout.addWidget(self.cancel_button)
+            
+            # 将所有组件添加到主布局
+            main_layout.addWidget(label)
+            main_layout.addWidget(self.name_input)
+            main_layout.addWidget(self.error_label)
+            main_layout.addLayout(button_layout)
         
     def _on_text_changed(self, text):
         """
         当输入框内容改变时调用
         """
+        # 只在保存模式下处理
+        if self.is_updating:
+            return
+            
         # 检查 ok_button 是否已经创建
         if not hasattr(self, 'ok_button'):
             return
@@ -104,35 +141,69 @@ class SaveWorkflowDialog(QDialog):
         # 检查是否有内容
         has_content = bool(name)
         
-        # 检查是否重复（如果当前标签名不是"未命名"，且输入的是当前名称，则允许）
+        # 检查是否重复
         is_duplicate = name in self.existing_names
-        is_updating_current = (self.current_name != "未命名") and (name == self.current_name)
+        
+        # 显示/隐藏错误提示
+        if has_content and is_duplicate:
+            self.error_label.setText("流程名称已经存在，请换一个名称重试")
+        else:
+            self.error_label.setText("")
         
         # 启用/禁用确定按钮
-        self.ok_button.setEnabled(has_content and (not is_duplicate or is_updating_current))
+        self.ok_button.setEnabled(has_content and not is_duplicate)
         
     def _on_ok_clicked(self):
         """
-        当点击确定按钮时调用
+        当点击确定/覆盖按钮时调用
         """
-        name = self.name_input.text().strip()
-        
-        # 再次验证
-        if not name:
-            QMessageBox.warning(self, "警告", "流程名称不能为空！")
-            return
+        if self.is_updating:
+            # 更新模式：直接用当前名称
+            name = self.current_name
+        else:
+            # 保存模式：从输入框获取
+            name = self.name_input.text().strip()
             
-        # 检查是否重复（如果当前标签名不是"未命名"，且输入的是当前名称，则允许）
-        is_duplicate = name in self.existing_names
-        is_updating_current = (self.current_name != "未命名") and (name == self.current_name)
-        
-        if is_duplicate and not is_updating_current:
-            QMessageBox.warning(self, "警告", "该流程名称已存在！")
-            return
+            # 验证
+            if not name:
+                QMessageBox.warning(self, "警告", "流程名称不能为空！")
+                return
+                
+            # 检查是否重复
+            is_duplicate = name in self.existing_names
+            
+            if is_duplicate:
+                QMessageBox.warning(self, "警告", "该流程名称已存在！")
+                return
             
         # 发出信号并关闭
         self.save_confirmed.emit(name)
         self.accept()
+        
+    def _on_save_as_clicked(self):
+        """
+        当点击另存为按钮时调用
+        """
+        # 关闭当前对话框
+        self.reject()
+        
+        # 在当前名称后加"_1"，并确保不重复
+        base_name = self.current_name
+        new_name = f"{base_name}_1"
+        counter = 2
+        while new_name in self.existing_names:
+            new_name = f"{base_name}_{counter}"
+            counter += 1
+        
+        # 创建新的保存对话框（非更新模式）
+        dialog = SaveWorkflowDialog(self.existing_names, "未命名", self.parent())
+        
+        # 自动填充建议的新名称
+        if hasattr(dialog, 'name_input'):
+            dialog.name_input.setText(new_name)
+        
+        dialog.save_confirmed.connect(self.save_confirmed.emit)
+        dialog.exec()
 
 
 class WorkflowManagerDialog(QDialog):
@@ -282,21 +353,10 @@ class WorkflowManagerDialog(QDialog):
         if current_item:
             name = current_item.text()
             
-            # 显示确认对话框
-            from PySide6.QtWidgets import QMessageBox, QPushButton
+            # 显示自定义确认对话框
+            dialog = DeleteConfirmDialog(name, self)
             
-            msg_box = QMessageBox(self)
-            msg_box.setWindowTitle("确认删除")
-            msg_box.setText(f"确定要删除流程 '{name}' 吗？")
-            msg_box.setIcon(QMessageBox.Question)
-            
-            # 添加中文按钮
-            no_button = msg_box.addButton("取消", QMessageBox.NoRole)
-            yes_button = msg_box.addButton("确定", QMessageBox.YesRole)
-            
-            msg_box.exec()
-            
-            if msg_box.clickedButton() == yes_button:
+            if dialog.exec() == QDialog.Accepted:
                 # 发出删除信号
                 self.delete_confirmed.emit(name)
                 # 从列表中移除
@@ -400,3 +460,62 @@ class WorkflowManagerDialog(QDialog):
         
         # 显示对话框
         dialog.exec()
+
+
+class DeleteConfirmDialog(QDialog):
+    """
+    自定义删除确认对话框
+    """
+    
+    def __init__(self, workflow_name, parent=None):
+        """
+        初始化删除确认对话框
+        
+        Args:
+            workflow_name: 要删除的流程名称
+            parent: 父控件
+        """
+        super().__init__(parent)
+        
+        self.workflow_name = workflow_name
+        
+        # 设置对话框属性
+        self.setWindowTitle("确认删除")
+        self.setMinimumSize(350, 120)
+        self.setObjectName("DeleteConfirmDialog")
+        
+        # 初始化 UI
+        self._init_ui()
+        
+    def _init_ui(self):
+        """
+        初始化用户界面
+        """
+        # 创建主布局
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(15)
+        
+        # 提示标签
+        label = QLabel(f"确定要删除流程 '{self.workflow_name}' 吗？")
+        label.setObjectName("DeleteDialogLabel")
+        
+        # 按钮区域
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        
+        # 确定按钮（在左侧）
+        ok_button = QPushButton("确定")
+        ok_button.setObjectName("DeleteOkButton")
+        ok_button.clicked.connect(self.accept)
+        button_layout.addWidget(ok_button)
+        
+        # 取消按钮（在右侧）
+        cancel_button = QPushButton("取消")
+        cancel_button.setObjectName("DeleteCancelButton")
+        cancel_button.clicked.connect(self.reject)
+        button_layout.addWidget(cancel_button)
+        
+        # 将所有组件添加到主布局
+        main_layout.addWidget(label)
+        main_layout.addLayout(button_layout)

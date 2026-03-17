@@ -395,43 +395,23 @@ class TabContent(QWidget):
         """
         current_name = self.get_current_tab_name()
         
-        if current_name != "未命名":
-            # 已保存的流程，显示确认对话框
-            from PySide6.QtWidgets import QMessageBox, QPushButton
-            
-            msg_box = QMessageBox(self)
-            msg_box.setWindowTitle("确认更新")
-            msg_box.setText(f"确定要更新流程 '{current_name}' 吗？")
-            msg_box.setIcon(QMessageBox.Question)
-            
-            # 添加按钮
-            no_button = msg_box.addButton("取消", QMessageBox.NoRole)
-            yes_button = msg_box.addButton("确定", QMessageBox.YesRole)
-            
-            msg_box.exec()
-            
-            if msg_box.clickedButton() == yes_button:
-                # 用户确认更新
-                self._on_save_workflow_confirmed(current_name)
-        else:
-            # 未保存的流程，显示输入对话框
-            # 获取流程管理器
-            workflow_manager = get_workflow_manager()
-            
-            # 获取已存在的流程名称
-            existing_names = workflow_manager.get_workflow_names()
-            
-            # 创建保存对话框
-            dialog = SaveWorkflowDialog(existing_names, current_name, self)
-            
-            # 连接信号
-            def on_save_confirmed(name):
-                self._on_save_workflow_confirmed(name)
-            
-            dialog.save_confirmed.connect(on_save_confirmed)
-            
-            # 显示对话框
-            dialog.exec()
+        # 获取流程管理器
+        workflow_manager = get_workflow_manager()
+        
+        # 获取已存在的流程名称
+        existing_names = workflow_manager.get_workflow_names()
+        
+        # 创建保存对话框
+        dialog = SaveWorkflowDialog(existing_names, current_name, self)
+        
+        # 连接信号
+        def on_save_confirmed(name):
+            self._on_save_workflow_confirmed(name)
+        
+        dialog.save_confirmed.connect(on_save_confirmed)
+        
+        # 显示对话框
+        dialog.exec()
         
     def _on_save_workflow_confirmed(self, name):
         """

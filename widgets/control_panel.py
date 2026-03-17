@@ -92,7 +92,7 @@ class ControlPanel(QWidget):
         
         # 保存按钮（图标）
         self.save_button = QPushButton("💾")
-        self.save_button.setToolTip("保存/更新")
+        self.save_button.setToolTip("保存")
         self.save_button.setMinimumSize(50, 40)
         self.save_button.setMaximumSize(50, 40)
         self.save_button.setObjectName("SaveButton")
@@ -182,10 +182,7 @@ class ControlPanel(QWidget):
         Args:
             text: 按钮文本
         """
-        if text == "更新":
-            self.save_button.setToolTip("更新")
-        else:
-            self.save_button.setToolTip("保存/更新")
+        self.save_button.setToolTip("保存")
         
     def add_control(self, control_widget):
         """
