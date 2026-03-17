@@ -145,7 +145,7 @@ class BaseControl(QWidget):
         
         # 子类将在这个布局中添加自己的控件
         self.content_layout = QVBoxLayout()
-        self.content_layout.setSpacing(8)
+        self.content_layout.setSpacing(5)
         
         # 将标题栏和内容布局添加到分组框主布局
         group_main_layout.addLayout(title_layout)

@@ -33,7 +33,7 @@ class RemoveDuplicateControl(BaseControl):
         layout = self.get_content_layout()
         
         grid_layout = QGridLayout()
-        grid_layout.setSpacing(10)
+        grid_layout.setSpacing(5)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         mode_label = QLabel("模式:")

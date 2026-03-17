@@ -34,7 +34,7 @@ class CaseConvertControl(BaseControl):
         
         # 使用GridLayout确保对齐
         grid_layout = QGridLayout()
-        grid_layout.setSpacing(10)
+        grid_layout.setSpacing(5)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：转换模式

@@ -33,7 +33,7 @@ class RemoveEmptyLinesControl(BaseControl):
         layout = self.get_content_layout()
         
         grid_layout = QGridLayout()
-        grid_layout.setSpacing(10)
+        grid_layout.setSpacing(5)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第 1 行：仅空白字符行
