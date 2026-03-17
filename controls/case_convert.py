@@ -43,6 +43,8 @@ class CaseConvertControl(BaseControl):
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.mode_combo = QComboBox()
+        self.mode_combo.setEditable(True)
+        self.mode_combo.lineEdit().setReadOnly(True)
         self.mode_combo.addItems([
             "全部大写",
             "全部小写",

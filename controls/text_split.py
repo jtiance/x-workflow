@@ -44,6 +44,8 @@ class TextSplitControl(BaseControl):
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.mode_combo = QComboBox()
+        self.mode_combo.lineEdit().setReadOnly(True)
+        self.mode_combo.setEditable(True)
         self.mode_combo.addItems(["按分隔符分割", "按长度分割"])
         self.mode_combo.currentTextChanged.connect(self._on_mode_changed)
         self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
@@ -59,6 +61,7 @@ class TextSplitControl(BaseControl):
         
         self.delimiter_combo = QComboBox()
         self.delimiter_combo.setEditable(True)
+        self.delimiter_combo.lineEdit().setReadOnly(True)
         self.delimiter_combo.addItems([",", ";", "|", " ", "\t"])
         self.delimiter_combo.setCurrentText(",")
         self.delimiter_combo.currentTextChanged.connect(self._emit_parameters_changed)

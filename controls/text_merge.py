@@ -54,7 +54,8 @@ class TextMergeControl(BaseControl):
         join_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.join_combo = QComboBox()
-        self.join_combo.setEditable(False)
+        self.join_combo.setEditable(True)
+        self.join_combo.lineEdit().setReadOnly(True)
         self.join_combo.addItems(list(SEPARATOR_MAP.keys()))
         self.join_combo.setCurrentText("无")
         self.join_combo.currentTextChanged.connect(self._on_separator_changed)

@@ -57,6 +57,8 @@ class TextSearchDeleteControl(BaseControl):
         match_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.match_combo = QComboBox()
+        self.match_combo.setEditable(True)
+        self.match_combo.lineEdit().setReadOnly(True)
         self.match_combo.addItems(["包含文本", "不包含文本"])
         self.match_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.match_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -70,6 +72,8 @@ class TextSearchDeleteControl(BaseControl):
         delete_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.delete_combo = QComboBox()
+        self.delete_combo.setEditable(True)
+        self.delete_combo.lineEdit().setReadOnly(True)
         self.delete_combo.addItems(["删除匹配行", "删除非匹配行"])
         self.delete_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.delete_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

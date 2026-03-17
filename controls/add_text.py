@@ -43,6 +43,8 @@ class AddTextControl(BaseControl):
         type_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.type_combo = QComboBox()
+        self.type_combo.setEditable(True)
+        self.type_combo.lineEdit().setReadOnly(True)
         self.type_combo.addItems(["增加前缀", "增加后缀", "增加前后缀"])
         self.type_combo.currentIndexChanged.connect(self._emit_parameters_changed)
         self.type_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

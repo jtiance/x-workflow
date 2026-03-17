@@ -41,6 +41,8 @@ class RemoveDuplicateControl(BaseControl):
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.mode_combo = QComboBox()
+        self.mode_combo.setEditable(True)
+        self.mode_combo.lineEdit().setReadOnly(True)
         self.mode_combo.addItems(["保留首次出现", "保留最后一次出现"])
         self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.mode_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

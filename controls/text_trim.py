@@ -53,6 +53,8 @@ class TextTrimControl(BaseControl):
         direction_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.direction_combo = QComboBox()
+        self.direction_combo.setEditable(True)
+        self.direction_combo.lineEdit().setReadOnly(True)
         self.direction_combo.addItem("裁剪掉左侧的字符串", "before")
         self.direction_combo.addItem("裁剪掉右侧的字符串", "after")
         self.direction_combo.currentIndexChanged.connect(self._emit_parameters_changed)
@@ -66,6 +68,8 @@ class TextTrimControl(BaseControl):
         include_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.include_combo = QComboBox()
+        self.include_combo.setEditable(True)
+        self.include_combo.lineEdit().setReadOnly(True)
         self.include_combo.addItem("是", False)
         self.include_combo.addItem("否", True)
         self.include_combo.currentIndexChanged.connect(self._emit_parameters_changed)
