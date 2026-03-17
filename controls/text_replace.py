@@ -51,7 +51,19 @@ class TextReplaceControl(BaseControl):
         grid_layout.addWidget(find_label, 0, 0)
         grid_layout.addWidget(self.find_input, 0, 1)
         
-        # 第2行：替换
+        # 第2行：查找选项（复选框）
+        self.case_checkbox = QCheckBox("忽略大小写")
+        self.case_checkbox.setChecked(False)
+        self.case_checkbox.stateChanged.connect(self._emit_parameters_changed)
+
+        self.regex_checkbox = QCheckBox("使用正则表达式")
+        self.regex_checkbox.setChecked(False)
+        self.regex_checkbox.stateChanged.connect(self._emit_parameters_changed)
+        
+        grid_layout.addWidget(self.case_checkbox, 1, 1)
+        grid_layout.addWidget(self.regex_checkbox, 2, 1)
+        
+        # 第3行：替换
         replace_label = QLabel("替换:")
         replace_label.setMinimumWidth(70)
         replace_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -61,20 +73,15 @@ class TextReplaceControl(BaseControl):
         self.replace_input.textChanged.connect(self._emit_parameters_changed)
         self.replace_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(replace_label, 1, 0)
-        grid_layout.addWidget(self.replace_input, 1, 1)
+        grid_layout.addWidget(replace_label, 3, 0)
+        grid_layout.addWidget(self.replace_input, 3, 1)
         
-        # 第3行：查找选项（复选框）
-        self.case_checkbox = QCheckBox("忽略大小写")
-        self.case_checkbox.setChecked(False)
-        self.case_checkbox.stateChanged.connect(self._emit_parameters_changed)
-
-        self.regex_checkbox = QCheckBox("使用正则表达式")
-        self.regex_checkbox.setChecked(False)
-        self.regex_checkbox.stateChanged.connect(self._emit_parameters_changed)
+        # 第4行：替换选项（复选框）
+        self.escape_checkbox = QCheckBox("转义字符")
+        self.escape_checkbox.setChecked(True)
+        self.escape_checkbox.stateChanged.connect(self._emit_parameters_changed)
         
-        grid_layout.addWidget(self.case_checkbox, 2, 0)
-        grid_layout.addWidget(self.regex_checkbox, 2, 1)
+        grid_layout.addWidget(self.escape_checkbox, 4, 1)
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)
@@ -117,6 +124,24 @@ class TextReplaceControl(BaseControl):
             bool: 是否忽略大小写
         """
         return self.case_checkbox.isChecked()
+    
+    def is_escape_chars(self):
+        """
+        是否转义字符
+        
+        Returns:
+            bool: 是否转义字符
+        """
+        return self.escape_checkbox.isChecked()
+    
+    def set_escape_chars(self, escape):
+        """
+        设置是否转义字符
+        
+        Args:
+            escape: 是否转义字符
+        """
+        self.escape_checkbox.setChecked(escape)
         
     def set_find_text(self, text):
         """
@@ -153,6 +178,33 @@ class TextReplaceControl(BaseControl):
             ignore_case: 是否忽略大小写
         """
         self.case_checkbox.setChecked(ignore_case)
+    
+    def _convert_escape_chars(self, text):
+        """
+        将转义字符转换为实际字符
+        
+        Args:
+            text: 包含转义字符的文本
+            
+        Returns:
+            str: 转换后的文本
+        """
+        if not text:
+            return text
+        
+        escape_map = {
+            '\\n': '\n',
+            '\\t': '\t',
+            '\\r': '\r',
+            '\\\\': '\\',
+            '\\0': '\0',
+        }
+        
+        result = text
+        for escape, char in escape_map.items():
+            result = result.replace(escape, char)
+        
+        return result
         
     def execute(self, text):
         """
@@ -166,6 +218,10 @@ class TextReplaceControl(BaseControl):
         """
         find_text = self.get_find_text()
         replace_text = self.get_replace_text()
+        
+        # 如果启用转义字符，则转换替换文本
+        if self.is_escape_chars():
+            replace_text = self._convert_escape_chars(replace_text)
         
         if not find_text:
             return text
@@ -231,6 +287,7 @@ class TextReplaceControl(BaseControl):
         self.set_replace_text("")
         self.set_use_regex(False)
         self.set_ignore_case(False)
+        self.set_escape_chars(False)
         
     def get_config(self):
         """
@@ -244,7 +301,8 @@ class TextReplaceControl(BaseControl):
             "find_text": self.get_find_text(),
             "replace_text": self.get_replace_text(),
             "use_regex": self.is_use_regex(),
-            "ignore_case": self.is_ignore_case()
+            "ignore_case": self.is_ignore_case(),
+            "escape_chars": self.is_escape_chars()
         }
         
     def load_config(self, config):
@@ -259,6 +317,7 @@ class TextReplaceControl(BaseControl):
             self.set_replace_text(config.get("replace_text", ""))
             self.set_use_regex(config.get("use_regex", False))
             self.set_ignore_case(config.get("ignore_case", False))
+            self.set_escape_chars(config.get("escape_chars", False))
             
     def get_control_type(self):
         """
