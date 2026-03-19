@@ -161,7 +161,7 @@ class ControlPanel(QWidget):
         
         # 创建执行按钮
         self.run_button = QPushButton("执行")
-        self.run_button.setMinimumHeight(50)  # 设置最小高度为50
+        self.run_button.setMinimumHeight(60)  # 设置最小高度为60，与箭头按钮所在的框高度一致
         self.run_button.setMinimumWidth(60)  # 设置最小宽度，更窄
         self.run_button.setObjectName("RunButton")
         self.run_button.clicked.connect(self.run_requested.emit)
