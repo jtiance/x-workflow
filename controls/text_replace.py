@@ -6,7 +6,8 @@
 
 import re
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QCheckBox, QSizePolicy
+from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QSizePolicy
+from components.custom_buttons import CheckablePushButton
 
 from controls.base_control import BaseControl
 
@@ -51,22 +52,45 @@ class TextReplaceControl(BaseControl):
         grid_layout.addWidget(find_label, 0, 0)
         grid_layout.addWidget(self.find_input, 0, 1)
         
-        # 第2行：查找选项（复选框）
-        self.case_checkbox = QCheckBox("忽略大小写")
+        # 第2行：查找选项（按钮组）
+        from PySide6.QtWidgets import QHBoxLayout
+        
+        # 创建水平布局容纳3个查找选项按钮
+        find_options_layout = QHBoxLayout()
+        find_options_layout.setSpacing(5)
+        
+        # 忽略大小写按钮
+        self.case_checkbox = CheckablePushButton("Aa")
         self.case_checkbox.setChecked(False)
-        self.case_checkbox.stateChanged.connect(self._emit_parameters_changed)
-
-        self.regex_checkbox = QCheckBox("使用正则表达式")
+        self.case_checkbox.setToolTip("忽略大小写")
+        self.case_checkbox.clicked.connect(self._emit_parameters_changed)
+        
+        # 使用正则表达式按钮
+        self.regex_checkbox = CheckablePushButton("RE")
         self.regex_checkbox.setChecked(False)
-        self.regex_checkbox.stateChanged.connect(self._emit_parameters_changed)
-
-        self.find_escape_checkbox = QCheckBox("查找转义字符")
+        self.regex_checkbox.setToolTip("使用正则表达式")
+        self.regex_checkbox.clicked.connect(self._emit_parameters_changed)
+        
+        # 查找转义字符按钮
+        self.find_escape_checkbox = CheckablePushButton("/r/n")
         self.find_escape_checkbox.setChecked(False)
-        self.find_escape_checkbox.stateChanged.connect(self._emit_parameters_changed)
-
-        grid_layout.addWidget(self.case_checkbox, 1, 1)
-        grid_layout.addWidget(self.regex_checkbox, 2, 1)
-        grid_layout.addWidget(self.find_escape_checkbox, 3, 1)
+        self.find_escape_checkbox.setToolTip("查找转义字符")
+        self.find_escape_checkbox.clicked.connect(self._emit_parameters_changed)
+        
+        # 设置按钮固定宽度
+        button_width = 40
+        self.case_checkbox.setFixedWidth(button_width)
+        self.regex_checkbox.setFixedWidth(button_width)
+        self.find_escape_checkbox.setFixedWidth(button_width)
+        
+        # 添加按钮到水平布局
+        find_options_layout.addWidget(self.case_checkbox)
+        find_options_layout.addWidget(self.regex_checkbox)
+        find_options_layout.addWidget(self.find_escape_checkbox)
+        find_options_layout.addStretch()  # 右侧添加弹性空间
+        
+        # 将水平布局添加到网格布局
+        grid_layout.addLayout(find_options_layout, 1, 1)
         
         # 第3行：替换
         replace_label = QLabel("替换:")
@@ -78,21 +102,23 @@ class TextReplaceControl(BaseControl):
         self.replace_input.textChanged.connect(self._emit_parameters_changed)
         self.replace_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(replace_label, 4, 0)
-        grid_layout.addWidget(self.replace_input, 4, 1)
+        grid_layout.addWidget(replace_label, 2, 0)
+        grid_layout.addWidget(self.replace_input, 2, 1)
         
         # 第4行：替换选项（复选框）
-        self.escape_checkbox = QCheckBox("转义字符")
+        self.escape_checkbox = CheckablePushButton("/r/n")
         self.escape_checkbox.setChecked(True)
-        self.escape_checkbox.stateChanged.connect(self._emit_parameters_changed)
+        self.escape_checkbox.setToolTip("替换转义字符")
+        self.escape_checkbox.setFixedWidth(40)
+        self.escape_checkbox.clicked.connect(self._emit_parameters_changed)
         
-        grid_layout.addWidget(self.escape_checkbox, 5, 1)
+        grid_layout.addWidget(self.escape_checkbox, 3, 1)
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)
         
         # 设置控件的最小高度，确保所有内容可见
-        self.setMinimumHeight(280)
+        self.setMinimumHeight(200)
         
         # 将GridLayout添加到内容布局
         layout.addLayout(grid_layout)
