@@ -11,6 +11,16 @@ from PySide6.QtCore import Qt
 from controls.base_control import BaseControl
 
 
+DELIMITER_MAP = {
+    "逗号": ",",
+    "分号": ";",
+    "竖线": "|",
+    "空格": " ",
+    "制表符": "\t",
+    "自定义": None
+}
+
+
 class TextSplitControl(BaseControl):
     """
     文本分割控件类
@@ -44,8 +54,8 @@ class TextSplitControl(BaseControl):
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.mode_combo = QComboBox()
-        self.mode_combo.lineEdit().setReadOnly(True)
         self.mode_combo.setEditable(True)
+        self.mode_combo.lineEdit().setReadOnly(True)
         self.mode_combo.addItems(["按分隔符分割", "按长度分割"])
         self.mode_combo.currentTextChanged.connect(self._on_mode_changed)
         self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
@@ -62,15 +72,25 @@ class TextSplitControl(BaseControl):
         self.delimiter_combo = QComboBox()
         self.delimiter_combo.setEditable(True)
         self.delimiter_combo.lineEdit().setReadOnly(True)
-        self.delimiter_combo.addItems([",", ";", "|", " ", "\t"])
-        self.delimiter_combo.setCurrentText(",")
+        self.delimiter_combo.addItems(list(DELIMITER_MAP.keys()))
+        self.delimiter_combo.setCurrentText("逗号")
+        self.delimiter_combo.currentTextChanged.connect(self._on_delimiter_changed)
         self.delimiter_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.delimiter_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
         grid_layout.addWidget(delimiter_label, 1, 0)
         grid_layout.addWidget(self.delimiter_combo, 1, 1)
         
-        # 第3行：字符数
+        # 第3行：自定义分隔符输入框
+        self.custom_delimiter_input = QLineEdit()
+        self.custom_delimiter_input.setPlaceholderText("请输入自定义分隔符")
+        self.custom_delimiter_input.setVisible(False)
+        self.custom_delimiter_input.textChanged.connect(self._emit_parameters_changed)
+        self.custom_delimiter_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        
+        grid_layout.addWidget(self.custom_delimiter_input, 2, 1)  # 放在第二列
+        
+        # 第4行：字符数
         length_label = QLabel("字符数:")
         length_label.setMinimumWidth(70)
         length_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -82,12 +102,13 @@ class TextSplitControl(BaseControl):
         self.length_spin.valueChanged.connect(self._emit_parameters_changed)
         self.length_spin.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(length_label, 2, 0)
-        grid_layout.addWidget(self.length_spin, 2, 1)
+        grid_layout.addWidget(length_label, 3, 0)
+        grid_layout.addWidget(self.length_spin, 3, 1)
         
         # 保存引用以便控制显隐
         self.delimiter_label = delimiter_label
         self.delimiter_combo_widget = self.delimiter_combo
+        self.custom_delimiter_input_widget = self.custom_delimiter_input
         self.length_label = length_label
         self.length_spin_widget = self.length_spin
         
@@ -106,13 +127,22 @@ class TextSplitControl(BaseControl):
         if mode_text == "按分隔符分割":
             self.delimiter_label.show()
             self.delimiter_combo_widget.show()
+            self.custom_delimiter_input_widget.show() if self.delimiter_combo.currentText() == "自定义" else self.custom_delimiter_input_widget.hide()
             self.length_label.hide()
             self.length_spin_widget.hide()
         elif mode_text == "按长度分割":
             self.delimiter_label.hide()
             self.delimiter_combo_widget.hide()
+            self.custom_delimiter_input_widget.hide()
             self.length_label.show()
             self.length_spin_widget.show()
+    
+    def _on_delimiter_changed(self, display_text):
+        """分隔符选项改变时的处理"""
+        if display_text == "自定义":
+            self.custom_delimiter_input_widget.setVisible(True)
+        else:
+            self.custom_delimiter_input_widget.setVisible(False)
     
     def get_split_mode(self):
         """
@@ -134,7 +164,12 @@ class TextSplitControl(BaseControl):
         Returns:
             str: 分隔符
         """
-        return self.delimiter_combo.currentText()
+        display_text = self.delimiter_combo.currentText()
+        
+        if display_text == "自定义":
+            return self.custom_delimiter_input.text()
+        
+        return DELIMITER_MAP.get(display_text, ",")
     
     def get_split_length(self):
         """
@@ -152,7 +187,17 @@ class TextSplitControl(BaseControl):
         Args:
             delimiter: 分隔符
         """
-        self.delimiter_combo.setCurrentText(delimiter)
+        found = False
+        for display_name, actual_delimiter in DELIMITER_MAP.items():
+            if actual_delimiter == delimiter:
+                self.delimiter_combo.setCurrentText(display_name)
+                found = True
+                break
+        
+        if not found:
+            self.delimiter_combo.setCurrentText("自定义")
+            self.custom_delimiter_input.setText(delimiter)
+            self.custom_delimiter_input.setVisible(True)
     
     def execute(self, text):
         """
@@ -184,7 +229,9 @@ class TextSplitControl(BaseControl):
         重置参数到默认值
         """
         self.mode_combo.setCurrentText("按分隔符分割")
-        self.delimiter_combo.setCurrentText(",")
+        self.delimiter_combo.setCurrentText("逗号")
+        self.custom_delimiter_input.setText("")
+        self.custom_delimiter_input.setVisible(False)
         self.length_spin.setValue(10)
         
     def get_config(self):

@@ -5,7 +5,8 @@
 """
 
 from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QLineEdit, 
-                              QCheckBox, QSizePolicy)
+                              QSizePolicy)
+from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -72,21 +73,36 @@ class TextMergeControl(BaseControl):
         self.custom_separator_input.textChanged.connect(self._emit_parameters_changed)
         self.custom_separator_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(self.custom_separator_input, 1, 0, 1, 2)
+        grid_layout.addWidget(self.custom_separator_input, 1, 1)  # 放在第二列
         
-        # 第3行：去除每行前后空白
-        self.trim_checkbox = QCheckBox("去除每行前后空白")
+        # 第3行：按钮组
+        from PySide6.QtWidgets import QHBoxLayout
+        
+        # 创建水平布局容纳2个按钮
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(5)
+        
+        # 去除每行前后空白按钮
+        self.trim_checkbox = CheckablePushButton("删除空白")
         self.trim_checkbox.setChecked(False)
-        self.trim_checkbox.stateChanged.connect(self._emit_parameters_changed)
+        self.trim_checkbox.setToolTip("删除文本前后的空白字符")
+        self.trim_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.trim_checkbox.setFixedWidth(90)
         
-        grid_layout.addWidget(self.trim_checkbox, 2, 0, 1, 2)  # 跨两列
-        
-        # 第4行：过滤空行
-        self.filter_checkbox = QCheckBox("过滤空行")
+        # 过滤空行按钮
+        self.filter_checkbox = CheckablePushButton("忽略空行")
         self.filter_checkbox.setChecked(True)
-        self.filter_checkbox.stateChanged.connect(self._emit_parameters_changed)
+        self.filter_checkbox.setToolTip("空行不增加额外连接符")
+        self.filter_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.filter_checkbox.setFixedWidth(90)
         
-        grid_layout.addWidget(self.filter_checkbox, 3, 0, 1, 2)  # 跨两列
+        # 添加按钮到水平布局
+        button_layout.addWidget(self.trim_checkbox)
+        button_layout.addWidget(self.filter_checkbox)
+        button_layout.addStretch()  # 右侧添加弹性空间
+        
+        # 将水平布局添加到网格布局
+        grid_layout.addLayout(button_layout, 2, 1)  # 放在第二列
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)

@@ -5,7 +5,8 @@
 """
 
 from PySide6.QtWidgets import (QGridLayout, QLabel, QLineEdit, QComboBox, 
-                              QCheckBox, QSizePolicy)
+                              QSizePolicy)
+from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -51,7 +52,36 @@ class TextSearchDeleteControl(BaseControl):
         grid_layout.addWidget(search_label, 0, 0)
         grid_layout.addWidget(self.search_input, 0, 1)
         
-        # 第2行：匹配模式
+        # 第2行：按钮组
+        from PySide6.QtWidgets import QHBoxLayout
+        
+        # 创建水平布局容纳2个按钮
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(5)
+        
+        # 区分大小写按钮
+        self.case_checkbox = CheckablePushButton("Aa")
+        self.case_checkbox.setChecked(False)
+        self.case_checkbox.setToolTip("区分大小写")
+        self.case_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.case_checkbox.setFixedWidth(40)
+        
+        # 使用正则表达式按钮
+        self.regex_checkbox = CheckablePushButton("RE")
+        self.regex_checkbox.setChecked(False)
+        self.regex_checkbox.setToolTip("使用正则表达式")
+        self.regex_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.regex_checkbox.setFixedWidth(40)
+        
+        # 添加按钮到水平布局
+        button_layout.addWidget(self.case_checkbox)
+        button_layout.addWidget(self.regex_checkbox)
+        button_layout.addStretch()  # 右侧添加弹性空间
+        
+        # 将水平布局添加到网格布局
+        grid_layout.addLayout(button_layout, 1, 1)  # 放在第二列
+        
+        # 第3行：匹配模式
         match_label = QLabel("匹配模式:")
         match_label.setMinimumWidth(70)
         match_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -63,10 +93,10 @@ class TextSearchDeleteControl(BaseControl):
         self.match_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.match_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(match_label, 1, 0)
-        grid_layout.addWidget(self.match_combo, 1, 1)
+        grid_layout.addWidget(match_label, 2, 0)
+        grid_layout.addWidget(self.match_combo, 2, 1)
         
-        # 第3行：删除模式
+        # 第4行：删除模式
         delete_label = QLabel("删除模式:")
         delete_label.setMinimumWidth(70)
         delete_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -78,22 +108,8 @@ class TextSearchDeleteControl(BaseControl):
         self.delete_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.delete_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(delete_label, 2, 0)
-        grid_layout.addWidget(self.delete_combo, 2, 1)
-        
-        # 第4行：区分大小写
-        self.case_checkbox = QCheckBox("区分大小写")
-        self.case_checkbox.setChecked(False)
-        self.case_checkbox.stateChanged.connect(self._emit_parameters_changed)
-        
-        grid_layout.addWidget(self.case_checkbox, 3, 0, 1, 2)  # 跨两列
-        
-        # 第5行：使用正则表达式
-        self.regex_checkbox = QCheckBox("使用正则表达式")
-        self.regex_checkbox.setChecked(False)
-        self.regex_checkbox.stateChanged.connect(self._emit_parameters_changed)
-        
-        grid_layout.addWidget(self.regex_checkbox, 4, 0, 1, 2)  # 跨两列
+        grid_layout.addWidget(delete_label, 3, 0)
+        grid_layout.addWidget(self.delete_combo, 3, 1)
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)

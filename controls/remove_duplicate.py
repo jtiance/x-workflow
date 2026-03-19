@@ -4,7 +4,8 @@
 提供移除文本中重复行的功能
 """
 
-from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QCheckBox, QSizePolicy)
+from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QSizePolicy)
+from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -50,27 +51,34 @@ class RemoveDuplicateControl(BaseControl):
         grid_layout.addWidget(mode_label, 0, 0)
         grid_layout.addWidget(self.mode_combo, 0, 1)
         
-        ignore_case_label = QLabel("忽略大小写:")
-        ignore_case_label.setMinimumWidth(70)
-        ignore_case_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # 第2行：按钮组
+        from PySide6.QtWidgets import QHBoxLayout
         
-        self.ignore_case_check = QCheckBox()
-        self.ignore_case_check.stateChanged.connect(self._emit_parameters_changed)
-        self.ignore_case_check.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        # 创建水平布局容纳2个按钮
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(5)
         
-        grid_layout.addWidget(ignore_case_label, 1, 0)
-        grid_layout.addWidget(self.ignore_case_check, 1, 1)
+        # 忽略大小写按钮
+        self.ignore_case_check = CheckablePushButton("Aa")
+        self.ignore_case_check.setChecked(False)
+        self.ignore_case_check.setToolTip("忽略大小写")
+        self.ignore_case_check.clicked.connect(self._emit_parameters_changed)
+        self.ignore_case_check.setFixedWidth(40)
         
-        ignore_blank_label = QLabel("忽略空行:")
-        ignore_blank_label.setMinimumWidth(70)
-        ignore_blank_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # 忽略空行按钮
+        self.ignore_blank_check = CheckablePushButton("忽略空行")
+        self.ignore_blank_check.setChecked(False)
+        self.ignore_blank_check.setToolTip("空行不会被移除重复行")
+        self.ignore_blank_check.clicked.connect(self._emit_parameters_changed)
+        self.ignore_blank_check.setFixedWidth(60)
         
-        self.ignore_blank_check = QCheckBox()
-        self.ignore_blank_check.stateChanged.connect(self._emit_parameters_changed)
-        self.ignore_blank_check.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        # 添加按钮到水平布局
+        button_layout.addWidget(self.ignore_case_check)
+        button_layout.addWidget(self.ignore_blank_check)
+        button_layout.addStretch()  # 右侧添加弹性空间
         
-        grid_layout.addWidget(ignore_blank_label, 2, 0)
-        grid_layout.addWidget(self.ignore_blank_check, 2, 1)
+        # 将水平布局添加到网格布局
+        grid_layout.addLayout(button_layout, 1, 1)  # 放在第二列
         
         grid_layout.setColumnStretch(1, 1)
         

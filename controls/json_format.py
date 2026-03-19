@@ -5,7 +5,8 @@ JSON格式化控件模块
 """
 
 import json
-from PySide6.QtWidgets import QGridLayout, QLabel, QCheckBox, QSpinBox, QSizePolicy
+from PySide6.QtWidgets import QGridLayout, QLabel, QSpinBox, QSizePolicy
+from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -55,18 +56,22 @@ class JsonFormatControl(BaseControl):
         grid_layout.addWidget(self.indent_spin, 0, 1)
         
         # 第2行：按键名排序
-        self.sort_checkbox = QCheckBox("按键名排序")
+        self.sort_checkbox = CheckablePushButton("排序")
         self.sort_checkbox.setChecked(False)
-        self.sort_checkbox.stateChanged.connect(self._emit_parameters_changed)
+        self.sort_checkbox.setToolTip("按键名排序")
+        self.sort_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.sort_checkbox.setFixedWidth(60)
         
-        grid_layout.addWidget(self.sort_checkbox, 1, 0, 1, 2)  # 跨两列
+        grid_layout.addWidget(self.sort_checkbox, 1, 1)  # 放在第二列
         
         # 第3行：确保ASCII
-        self.ascii_checkbox = QCheckBox("确保ASCII（转义非ASCII字符）")
+        self.ascii_checkbox = CheckablePushButton("ASCII")
         self.ascii_checkbox.setChecked(False)
-        self.ascii_checkbox.stateChanged.connect(self._emit_parameters_changed)
+        self.ascii_checkbox.setToolTip("确保ASCII（转义非ASCII字符）")
+        self.ascii_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.ascii_checkbox.setFixedWidth(60)
         
-        grid_layout.addWidget(self.ascii_checkbox, 2, 0, 1, 2)  # 跨两列
+        grid_layout.addWidget(self.ascii_checkbox, 2, 1)  # 放在第二列
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)

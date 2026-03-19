@@ -4,7 +4,8 @@
 提供移除文本中空行的功能
 """
 
-from PySide6.QtWidgets import (QGridLayout, QLabel, QCheckBox, QSizePolicy)
+from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QSizePolicy)
+from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
 
 from controls.base_control import BaseControl
@@ -36,30 +37,40 @@ class RemoveEmptyLinesControl(BaseControl):
         grid_layout.setSpacing(5)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
-        # 第 1 行：仅空白字符行
-        blank_label = QLabel("仅空白字符行:")
-        blank_label.setMinimumWidth(70)
-        blank_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # 第 1 行：移除模式
+        mode_label = QLabel("移除模式:")
+        mode_label.setMinimumWidth(70)
+        mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.blank_check = QCheckBox()
-        self.blank_check.setChecked(False)
-        self.blank_check.stateChanged.connect(self._emit_parameters_changed)
+        self.mode_combo = QComboBox()
+        self.mode_combo.setEditable(True)
+        self.mode_combo.lineEdit().setReadOnly(True)
+        self.mode_combo.addItems(["移除所有空行", "仅移除空白字符行", "仅移除完全空行"])
+        self.mode_combo.setCurrentText("移除所有空行")
+        self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
+        self.mode_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(blank_label, 0, 0)
-        grid_layout.addWidget(self.blank_check, 0, 1)
+        grid_layout.addWidget(mode_label, 0, 0)
+        grid_layout.addWidget(self.mode_combo, 0, 1)
         
         grid_layout.setColumnStretch(1, 1)
         
         layout.addLayout(grid_layout)
     
-    def is_only_blank(self):
+    def get_remove_mode(self):
         """
-        获取是否仅移除仅包含空白字符的行
+        获取移除模式
         
         Returns:
-            bool: 是否仅移除仅包含空白字符的行
+            str: 移除模式 ('all', 'only_blank', 'only_empty')
         """
-        return self.blank_check.isChecked()
+        mode_text = self.mode_combo.currentText()
+        if mode_text == "仅移除空白字符行":
+            return "only_blank"
+        elif mode_text == "仅移除完全空行":
+            return "only_empty"
+        else:
+            return "all"
     
     def execute(self, text):
         """
@@ -77,16 +88,20 @@ class RemoveEmptyLinesControl(BaseControl):
         lines = text.split('\n')
         result = []
         
-        only_blank = self.is_only_blank()
+        mode = self.get_remove_mode()
         
         for line in lines:
-            if only_blank:
-                # 仅移除仅包含空白字符的行
-                if line.strip():
+            if mode == "only_blank":
+                # 仅移除仅包含空白字符的行，保留完全空的行
+                if not line or line.strip():
+                    result.append(line)
+            elif mode == "only_empty":
+                # 仅移除完全空行（不包含任何字符的行）
+                if line:
                     result.append(line)
             else:
                 # 移除所有空行（包括仅包含空白字符的行）
-                if line:
+                if line.strip():
                     result.append(line)
         
         return '\n'.join(result)
@@ -95,7 +110,7 @@ class RemoveEmptyLinesControl(BaseControl):
         """
         重置参数到默认值
         """
-        self.blank_check.setChecked(False)
+        self.mode_combo.setCurrentText("移除所有空行")
         
     def get_config(self):
         """
@@ -106,7 +121,7 @@ class RemoveEmptyLinesControl(BaseControl):
         """
         return {
             "type": "remove_empty_lines",
-            "only_blank": self.is_only_blank()
+            "remove_mode": self.get_remove_mode()
         }
         
     def load_config(self, config):
@@ -117,7 +132,13 @@ class RemoveEmptyLinesControl(BaseControl):
             config: 控件配置字典
         """
         if config.get("type") == "remove_empty_lines":
-            self.blank_check.setChecked(config.get("only_blank", False))
+            remove_mode = config.get("remove_mode", "all")
+            if remove_mode == "only_blank":
+                self.mode_combo.setCurrentText("仅移除空白字符行")
+            elif remove_mode == "only_empty":
+                self.mode_combo.setCurrentText("仅移除完全空行")
+            else:
+                self.mode_combo.setCurrentText("移除所有空行")
             
     def get_control_type(self):
         """
