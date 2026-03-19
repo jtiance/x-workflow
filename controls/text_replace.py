@@ -35,7 +35,7 @@ class TextReplaceControl(BaseControl):
         
         # 使用GridLayout确保对齐
         grid_layout = QGridLayout()
-        grid_layout.setSpacing(5)
+        grid_layout.setSpacing(3)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：查找
@@ -59,9 +59,14 @@ class TextReplaceControl(BaseControl):
         self.regex_checkbox = QCheckBox("使用正则表达式")
         self.regex_checkbox.setChecked(False)
         self.regex_checkbox.stateChanged.connect(self._emit_parameters_changed)
-        
+
+        self.find_escape_checkbox = QCheckBox("查找转义字符")
+        self.find_escape_checkbox.setChecked(False)
+        self.find_escape_checkbox.stateChanged.connect(self._emit_parameters_changed)
+
         grid_layout.addWidget(self.case_checkbox, 1, 1)
         grid_layout.addWidget(self.regex_checkbox, 2, 1)
+        grid_layout.addWidget(self.find_escape_checkbox, 3, 1)
         
         # 第3行：替换
         replace_label = QLabel("替换:")
@@ -73,18 +78,21 @@ class TextReplaceControl(BaseControl):
         self.replace_input.textChanged.connect(self._emit_parameters_changed)
         self.replace_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        grid_layout.addWidget(replace_label, 3, 0)
-        grid_layout.addWidget(self.replace_input, 3, 1)
+        grid_layout.addWidget(replace_label, 4, 0)
+        grid_layout.addWidget(self.replace_input, 4, 1)
         
         # 第4行：替换选项（复选框）
         self.escape_checkbox = QCheckBox("转义字符")
         self.escape_checkbox.setChecked(True)
         self.escape_checkbox.stateChanged.connect(self._emit_parameters_changed)
         
-        grid_layout.addWidget(self.escape_checkbox, 4, 1)
+        grid_layout.addWidget(self.escape_checkbox, 5, 1)
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)
+        
+        # 设置控件的最小高度，确保所有内容可见
+        self.setMinimumHeight(280)
         
         # 将GridLayout添加到内容布局
         layout.addLayout(grid_layout)
@@ -134,6 +142,15 @@ class TextReplaceControl(BaseControl):
         """
         return self.escape_checkbox.isChecked()
     
+    def is_find_escape_chars(self):
+        """
+        是否在查找时转义字符
+        
+        Returns:
+            bool: 是否在查找时转义字符
+        """
+        return self.find_escape_checkbox.isChecked()
+    
     def set_escape_chars(self, escape):
         """
         设置是否转义字符
@@ -142,6 +159,15 @@ class TextReplaceControl(BaseControl):
             escape: 是否转义字符
         """
         self.escape_checkbox.setChecked(escape)
+    
+    def set_find_escape_chars(self, escape):
+        """
+        设置是否在查找时转义字符
+        
+        Args:
+            escape: 是否在查找时转义字符
+        """
+        self.find_escape_checkbox.setChecked(escape)
         
     def set_find_text(self, text):
         """
@@ -219,6 +245,10 @@ class TextReplaceControl(BaseControl):
         find_text = self.get_find_text()
         replace_text = self.get_replace_text()
         
+        # 如果启用查找转义字符，则转换查找文本
+        if self.is_find_escape_chars():
+            find_text = self._convert_escape_chars(find_text)
+        
         # 如果启用转义字符，则转换替换文本
         if self.is_escape_chars():
             replace_text = self._convert_escape_chars(replace_text)
@@ -288,6 +318,7 @@ class TextReplaceControl(BaseControl):
         self.set_use_regex(False)
         self.set_ignore_case(False)
         self.set_escape_chars(False)
+        self.set_find_escape_chars(False)
         
     def get_config(self):
         """
@@ -302,7 +333,8 @@ class TextReplaceControl(BaseControl):
             "replace_text": self.get_replace_text(),
             "use_regex": self.is_use_regex(),
             "ignore_case": self.is_ignore_case(),
-            "escape_chars": self.is_escape_chars()
+            "escape_chars": self.is_escape_chars(),
+            "find_escape_chars": self.is_find_escape_chars()
         }
         
     def load_config(self, config):
@@ -318,6 +350,7 @@ class TextReplaceControl(BaseControl):
             self.set_use_regex(config.get("use_regex", False))
             self.set_ignore_case(config.get("ignore_case", False))
             self.set_escape_chars(config.get("escape_chars", False))
+            self.set_find_escape_chars(config.get("find_escape_chars", False))
             
     def get_control_type(self):
         """
