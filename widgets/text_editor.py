@@ -4,9 +4,9 @@
 提供带行号的代码编辑功能
 """
 
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPlainTextEdit, QTextEdit
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QPlainTextEdit, QTextEdit, QMenu
 from PySide6.QtCore import Qt, Signal, QRect, QSize
-from PySide6.QtGui import QPainter, QColor, QTextFormat, QTextCursor
+from PySide6.QtGui import QPainter, QColor, QTextFormat, QTextCursor, QKeySequence, QClipboard, QGuiApplication
 
 
 class LineNumberArea(QWidget):
@@ -332,3 +332,50 @@ class CodeEditor(QPlainTextEdit):
             int: 字体大小
         """
         return self._font_size
+    
+    def copy_to_clipboard(self):
+        """
+        将选中的文本以纯文本格式复制到剪贴板
+        确保所有转义字符（\t、\n、\r 等）正确保留
+        """
+        cursor = self.textCursor()
+        selected_text = cursor.selectedText()
+        
+        if selected_text:
+            # QTextCursor.selectedText() 使用特殊字符表示换行，需要转换
+            # 将 Unicode 段落分隔符 (U+2029) 转换为 \n
+            # 将 Unicode 行分隔符 (U+2028) 转换为 \n
+            selected_text = selected_text.replace('\u2029', '\n').replace('\u2028', '\n')
+            
+            clipboard = QGuiApplication.clipboard()
+            clipboard.setText(selected_text, QClipboard.Clipboard)
+    
+    def contextMenuEvent(self, event):
+        """
+        创建右键菜单，添加"复制（纯文本）"选项
+        """
+        menu = self.createStandardContextMenu()
+        
+        # 添加分隔符
+        menu.addSeparator()
+        
+        # 添加"复制（纯文本）"选项
+        copy_plain_action = menu.addAction("复制（纯文本）")
+        copy_plain_action.setShortcut(QKeySequence.Copy)
+        copy_plain_action.triggered.connect(self.copy_to_clipboard)
+        
+        # 只有在选中文本时才启用
+        cursor = self.textCursor()
+        copy_plain_action.setEnabled(cursor.hasSelection())
+        
+        menu.exec_(event.globalPos())
+    
+    def keyPressEvent(self, event):
+        """
+        重写键盘事件，捕获 Ctrl+C 并使用自定义复制功能
+        """
+        if event.matches(QKeySequence.Copy):
+            self.copy_to_clipboard()
+            event.accept()
+        else:
+            super().keyPressEvent(event)
