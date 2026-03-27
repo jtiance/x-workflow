@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         import sys
         from pathlib import Path
         from PySide6.QtGui import QIcon
+        import platform
         
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             # PyInstaller 打包后的环境
@@ -47,7 +48,10 @@ class MainWindow(QMainWindow):
             base_path = Path(__file__).parent.parent
         
         # 根据操作系统选择图标格式
-        icon_path = base_path / "X-Workflow.png"
+        if platform.system() == 'Darwin':  # macOS
+            icon_path = base_path / "X-Workflow.icns"
+        else:  # Windows 或其他系统
+            icon_path = base_path / "X-Workflow.png"
         
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))

@@ -70,7 +70,11 @@ def main():
     from PySide6.QtGui import QIcon
     import platform
     
-    icon_path = get_resource_path("X-Workflow.png")
+    # 根据操作系统选择图标格式
+    if platform.system() == 'Darwin':  # macOS
+        icon_path = get_resource_path("X-Workflow.icns")
+    else:  # Windows 或其他系统
+        icon_path = get_resource_path("X-Workflow.png")
     
     if icon_path.exists():
         app.setWindowIcon(QIcon(str(icon_path)))
