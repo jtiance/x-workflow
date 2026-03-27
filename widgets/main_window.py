@@ -34,6 +34,24 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(1000, 700)  # 设置最小尺寸
         self.setObjectName("MainWindow")
         
+        # 设置窗口图标
+        import sys
+        from pathlib import Path
+        from PySide6.QtGui import QIcon
+        
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            # PyInstaller 打包后的环境
+            base_path = Path(sys._MEIPASS)
+        else:
+            # 开发环境
+            base_path = Path(__file__).parent.parent
+        
+        # 根据操作系统选择图标格式
+        icon_path = base_path / "X-Workflow.png"
+        
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         # 初始化 UI
         self._init_ui()
         

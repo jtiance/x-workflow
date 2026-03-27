@@ -66,6 +66,15 @@ def main():
     # 设置应用程序名称
     app.setApplicationName("X-Workflow")
     
+    # 设置应用程序图标
+    from PySide6.QtGui import QIcon
+    import platform
+    
+    icon_path = get_resource_path("X-Workflow.png")
+    
+    if icon_path.exists():
+        app.setWindowIcon(QIcon(str(icon_path)))
+    
     # 应用 qt-material 样式
     # 可选主题: 'dark_amber.xml', 'dark_blue.xml', 'dark_cyan.xml', 'dark_lightgreen.xml',
     #           'dark_pink.xml', 'dark_purple.xml', 'dark_red.xml', 'dark_teal.xml',
