@@ -73,7 +73,7 @@ python main.py
 使用 PyInstaller 打包成可执行文件：
 
 ```bash
-poetry run pyinstaller --name X-Workflow --windowed --add-data "workflow-config.json:." main.py
+poetry run pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --add-data "workflow-config.json:." --add-data "X-Workflow.png:." --add-data "X-Workflow.icns:." main.py
 ```
 
 打包完成后，可执行文件位于 `dist/X-Workflow` 目录下。
@@ -108,7 +108,9 @@ x-workflow/
 │   ├── case_convert.py         # 大小写转换控件
 │   ├── text_split.py           # 文本分割控件
 │   ├── text_merge.py           # 文本合并控件
-│   └── remove_duplicate.py     # 移除重复行控件
+│   ├── remove_duplicate.py     # 移除重复行控件
+│   ├── remove_empty_lines.py   # 移除空行控件
+│   └── text_trim.py            # 文本裁剪控件
 └── README.md
 ```
 
@@ -221,6 +223,16 @@ x-workflow/
 - **功能**：移除文本中的重复行
 - **参数**：模式（保留首次出现/保留最后一次出现）、忽略大小写、忽略空行
 
+### 移除空行 (remove\_empty\_lines)
+
+- **功能**：移除文本中的空行
+- **参数**：移除模式（移除所有空行、仅移除空白字符行、仅移除完全空行）
+
+### 文本裁剪 (text\_trim)
+
+- **功能**：根据匹配字符串裁剪文本
+- **参数**：匹配字符串、裁剪方向（裁剪掉左侧的字符串/裁剪掉右侧的字符串）、是否裁剪匹配的文本
+
 ## 配置文件格式
 
 工作流配置保存在 `~/.x-workflow/workflow-config.json` 中，格式如下：
@@ -261,6 +273,11 @@ x-workflow/
 <br />
 
 ## 版本历史
+
+### v1.3.0
+
+- 新增"移除空行"控件
+- 新增"文本裁剪"控件
 
 ### v1.2.0
 
