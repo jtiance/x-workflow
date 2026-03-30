@@ -4,9 +4,12 @@
 提供带行号的代码编辑功能
 """
 
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPlainTextEdit, QTextEdit, QMenu
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QTextEdit
 from PySide6.QtCore import Qt, Signal, QRect, QSize
-from PySide6.QtGui import QPainter, QColor, QTextFormat, QTextCursor, QKeySequence, QClipboard, QGuiApplication
+from PySide6.QtGui import QPainter, QColor, QTextFormat
+
+# 导入 qfluentwidgets 的 PlainTextEdit
+from qfluentwidgets import PlainTextEdit as FluentPlainTextEdit
 
 
 class LineNumberArea(QWidget):
@@ -164,7 +167,7 @@ class TextEditor(QWidget):
         return self.text_edit.get_font_size()
 
 
-class CodeEditor(QPlainTextEdit):
+class CodeEditor(FluentPlainTextEdit):
     """
     带行号的代码编辑器
     """
@@ -202,18 +205,24 @@ class CodeEditor(QPlainTextEdit):
     def line_number_area_width(self):
         """
         计算行号区域需要的宽度
-        
+
         Returns:
             int: 宽度（像素）
         """
+        # 左侧冗余边距
+        left_padding = 10
+
         digits = 1
         max_value = max(1, self.blockCount())
         while max_value >= 10:
             max_value /= 10
             digits += 1
-        
-        # 计算宽度：数字宽度 + 边距
-        space = 3 + self.fontMetrics().horizontalAdvance('9') * digits
+
+        # 确保至少能显示3位数字的宽度
+        digits = max(digits, 3)
+
+        # 计算宽度：左边距 + 数字宽度 + 右边距
+        space = left_padding + self.fontMetrics().horizontalAdvance('9') * digits + 3
         return space
         
     def update_line_number_area_width(self, new_block_count):
@@ -262,17 +271,21 @@ class CodeEditor(QPlainTextEdit):
         """
         painter = QPainter(self.line_number_area)
         painter.fillRect(event.rect(), QColor("#2b2b2b"))
-        
+
+        # 左侧冗余边距
+        left_padding = 10
+
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
         top = self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
         bottom = top + self.blockBoundingRect(block).height()
-        
+
         while block.isValid() and top <= event.rect().bottom():
             if block.isVisible() and bottom >= event.rect().top():
                 number = str(block_number + 1)
                 painter.setPen(QColor("#606366"))
-                painter.drawText(0, int(top), self.line_number_area.width(), 
+                # 从左侧边距开始绘制，右边保留8像素间距
+                painter.drawText(left_padding, int(top), self.line_number_area.width() - left_padding - 8,
                                 self.fontMetrics().height(),
                                 Qt.AlignRight, number)
                 
@@ -332,50 +345,3 @@ class CodeEditor(QPlainTextEdit):
             int: 字体大小
         """
         return self._font_size
-    
-    def copy_to_clipboard(self):
-        """
-        将选中的文本以纯文本格式复制到剪贴板
-        确保所有转义字符（\t、\n、\r 等）正确保留
-        """
-        cursor = self.textCursor()
-        selected_text = cursor.selectedText()
-        
-        if selected_text:
-            # QTextCursor.selectedText() 使用特殊字符表示换行，需要转换
-            # 将 Unicode 段落分隔符 (U+2029) 转换为 \n
-            # 将 Unicode 行分隔符 (U+2028) 转换为 \n
-            selected_text = selected_text.replace('\u2029', '\n').replace('\u2028', '\n')
-            
-            clipboard = QGuiApplication.clipboard()
-            clipboard.setText(selected_text, QClipboard.Clipboard)
-    
-    def contextMenuEvent(self, event):
-        """
-        创建右键菜单，添加"复制（纯文本）"选项
-        """
-        menu = self.createStandardContextMenu()
-        
-        # 添加分隔符
-        menu.addSeparator()
-        
-        # 添加"复制（纯文本）"选项
-        copy_plain_action = menu.addAction("复制（纯文本）")
-        copy_plain_action.setShortcut(QKeySequence.Copy)
-        copy_plain_action.triggered.connect(self.copy_to_clipboard)
-        
-        # 只有在选中文本时才启用
-        cursor = self.textCursor()
-        copy_plain_action.setEnabled(cursor.hasSelection())
-        
-        menu.exec_(event.globalPos())
-    
-    def keyPressEvent(self, event):
-        """
-        重写键盘事件，捕获 Ctrl+C 并使用自定义复制功能
-        """
-        if event.matches(QKeySequence.Copy):
-            self.copy_to_clipboard()
-            event.accept()
-        else:
-            super().keyPressEvent(event)
