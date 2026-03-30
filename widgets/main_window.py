@@ -167,23 +167,59 @@ class MainWindow(QMainWindow):
         
         # 查看菜单
         view_menu = menubar.addMenu("查看(&V)")
-        
+
         # 字体子菜单
         font_menu = QMenu("字体(&F)", self)
         view_menu.addMenu(font_menu)
-        
+
         # 放大字号动作
         zoom_in_action = QAction("放大文本字号(&I)", self)
         zoom_in_action.setShortcut("Ctrl+=")
         zoom_in_action.triggered.connect(self._zoom_in_text)
         font_menu.addAction(zoom_in_action)
-        
+
         # 缩小字号动作
         zoom_out_action = QAction("缩小文本字号(&O)", self)
         zoom_out_action.setShortcut("Ctrl+-")
         zoom_out_action.triggered.connect(self._zoom_out_text)
         font_menu.addAction(zoom_out_action)
-        
+
+        # 语法菜单
+        syntax_menu = menubar.addMenu("语法(&S)")
+
+        # Plain Text（无高亮）
+        plain_text_action = QAction("Plain Text", self)
+        plain_text_action.triggered.connect(lambda: self._set_syntax_language('text'))
+        syntax_menu.addAction(plain_text_action)
+
+        # 添加分隔符
+        syntax_menu.addSeparator()
+
+        # JSON 语法高亮
+        json_action = QAction("JSON", self)
+        json_action.triggered.connect(lambda: self._set_syntax_language('json'))
+        syntax_menu.addAction(json_action)
+
+        # SQL 语法高亮
+        sql_action = QAction("SQL", self)
+        sql_action.triggered.connect(lambda: self._set_syntax_language('sql'))
+        syntax_menu.addAction(sql_action)
+
+        # XML 语法高亮
+        xml_action = QAction("XML", self)
+        xml_action.triggered.connect(lambda: self._set_syntax_language('xml'))
+        syntax_menu.addAction(xml_action)
+
+        # HTML 语法高亮
+        html_action = QAction("HTML", self)
+        html_action.triggered.connect(lambda: self._set_syntax_language('html'))
+        syntax_menu.addAction(html_action)
+
+        # YAML 语法高亮
+        yaml_action = QAction("YAML", self)
+        yaml_action.triggered.connect(lambda: self._set_syntax_language('yaml'))
+        syntax_menu.addAction(yaml_action)
+
         # 帮助菜单
         help_menu = menubar.addMenu("帮助(&H)")
         
@@ -464,3 +500,19 @@ class MainWindow(QMainWindow):
                 text_editor = tab_content.get_text_editor()
                 if text_editor:
                     text_editor.zoom_out()
+
+    def _set_syntax_language(self, language):
+        """
+        设置当前标签页的语法高亮语言
+
+        Args:
+            language: 语言名称（text 表示 Plain Text，无高亮）
+        """
+        # 获取当前标签页
+        current_index = self.tab_widget.currentIndex()
+        if current_index >= 0:
+            tab_content = self.tab_widget.widget(current_index)
+            if tab_content:
+                text_editor = tab_content.get_text_editor()
+                if text_editor:
+                    text_editor.set_language(language)

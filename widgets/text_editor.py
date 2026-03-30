@@ -11,6 +11,9 @@ from PySide6.QtGui import QPainter, QColor, QTextFormat
 # 导入 qfluentwidgets 的 PlainTextEdit
 from qfluentwidgets import PlainTextEdit as FluentPlainTextEdit
 
+# 导入语法高亮器
+from components.syntax_highlighter import PygmentsHighlighter, SyntaxHighlighterFactory
+
 
 class LineNumberArea(QWidget):
     """
@@ -160,11 +163,29 @@ class TextEditor(QWidget):
     def get_font_size(self):
         """
         获取当前字体大小
-        
+
         Returns:
             int: 字体大小
         """
         return self.text_edit.get_font_size()
+
+    def set_language(self, language):
+        """
+        设置语法高亮语言
+
+        Args:
+            language: 语言名称（text 表示 Plain Text，无高亮）
+        """
+        self.text_edit.set_language(language)
+
+    def get_language(self):
+        """
+        获取当前语法高亮语言
+
+        Returns:
+            str: 当前语言名称
+        """
+        return self.text_edit.get_language()
 
 
 class CodeEditor(FluentPlainTextEdit):
@@ -183,7 +204,10 @@ class CodeEditor(FluentPlainTextEdit):
         
         # 创建行号区域
         self.line_number_area = LineNumberArea(self)
-        
+
+        # 初始化语法高亮器（默认 Plain Text，无高亮）
+        self.highlighter = PygmentsHighlighter(self.document(), language='text')
+
         # 连接信号
         self.blockCountChanged.connect(self.update_line_number_area_width)
         self.updateRequest.connect(self.update_line_number_area)
@@ -340,8 +364,29 @@ class CodeEditor(FluentPlainTextEdit):
     def get_font_size(self):
         """
         获取当前字体大小
-        
+
         Returns:
             int: 字体大小
         """
         return self._font_size
+
+    def set_language(self, language):
+        """
+        设置语法高亮语言
+
+        Args:
+            language: 语言名称（text 表示 Plain Text，无高亮）
+        """
+        if self.highlighter:
+            self.highlighter.set_language(language)
+
+    def get_language(self):
+        """
+        获取当前语法高亮语言
+
+        Returns:
+            str: 当前语言名称
+        """
+        if self.highlighter:
+            return self.highlighter.language
+        return 'text'

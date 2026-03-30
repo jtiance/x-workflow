@@ -12,7 +12,8 @@ requires-python = ">=3.10,<3.15"
 dependencies = [
     "pyside6 (>=6.10.2,<7.0.0)",
     "PySide6-Fluent-Widgets (>=1.8.0,<2.0.0)",
-    "pyinstaller (>=6.19.0,<7.0.0)"
+    "pyinstaller (>=6.19.0,<7.0.0)",
+    "pygments (>=2.18.0,<3.0.0)"
 ]
 
 
