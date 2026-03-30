@@ -4,12 +4,12 @@ X-Workflow 主程序入口
 一个基于 PySide6 和 PySide6-Fluent-Widgets 的可视化流程编辑器
 """
 
-import sys
-import os
 import shutil
+import sys
 from pathlib import Path
-from PySide6.QtWidgets import QApplication
+
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication
 from qfluentwidgets import setTheme, Theme
 
 from widgets.main_window import MainWindow

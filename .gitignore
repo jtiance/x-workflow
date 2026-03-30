@@ -5,3 +5,4 @@ __pycache__/
 X-Workflow.spec
 dist/
 build/
+.claude/settings.local.json
