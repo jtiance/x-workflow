@@ -6,9 +6,10 @@
 
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QListWidget, 
-    QListWidgetItem, QLabel, QPushButton, QFrame, QSplitter, QWidget
+    QListWidgetItem, QLabel, QFrame, QSplitter, QWidget
 )
 from PySide6.QtCore import Qt, Signal
+from qfluentwidgets import PushButton
 
 
 class ControlDialog(QDialog):
@@ -115,14 +116,12 @@ class ControlDialog(QDialog):
         button_layout.addStretch()  # 添加弹性空间
         
         # 确定按钮
-        self.ok_button = QPushButton("确定")
-        self.ok_button.setObjectName("OkButton")
+        self.ok_button = PushButton("确定")
         self.ok_button.clicked.connect(self._on_ok_clicked)
         self.ok_button.setEnabled(False)  # 初始禁用，直到选择控件
         
         # 取消按钮
-        self.cancel_button = QPushButton("取消")
-        self.cancel_button.setObjectName("CancelButton")
+        self.cancel_button = PushButton("取消")
         self.cancel_button.clicked.connect(self.reject)
         
         # 添加按钮

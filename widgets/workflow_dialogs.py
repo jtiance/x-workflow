@@ -6,9 +6,10 @@
 
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
-    QLineEdit, QListWidget, QPushButton, QMessageBox
+    QLineEdit, QListWidget, QMessageBox
 )
 from PySide6.QtCore import Signal
+from qfluentwidgets import PushButton
 
 
 class SaveWorkflowDialog(QDialog):
@@ -37,7 +38,6 @@ class SaveWorkflowDialog(QDialog):
         # 设置对话框属性
         self.setWindowTitle("保存流程")
         self.setMinimumSize(400, 180)
-        self.setObjectName("SaveWorkflowDialog")
         
         # 初始化 UI
         self._init_ui()
@@ -54,28 +54,23 @@ class SaveWorkflowDialog(QDialog):
         if self.is_updating:
             # 更新模式：只显示确认界面
             label = QLabel(f"确定要更新流程 '{self.current_name}' 吗？")
-            label.setObjectName("SaveDialogLabel")
-            # label.setAlignment(Qt.AlignCenter)
             
             # 按钮区域
             button_layout = QHBoxLayout()
             button_layout.addStretch()
             
             # 另存为按钮
-            self.save_as_button = QPushButton("另存为")
-            self.save_as_button.setObjectName("SaveAsButton")
+            self.save_as_button = PushButton("另存为")
             self.save_as_button.clicked.connect(self._on_save_as_clicked)
             button_layout.addWidget(self.save_as_button)
             
             # 覆盖按钮
-            self.ok_button = QPushButton("覆盖")
-            self.ok_button.setObjectName("SaveOkButton")
+            self.ok_button = PushButton("覆盖")
             self.ok_button.clicked.connect(self._on_ok_clicked)
             button_layout.addWidget(self.ok_button)
             
             # 取消按钮
-            self.cancel_button = QPushButton("取消")
-            self.cancel_button.setObjectName("SaveCancelButton")
+            self.cancel_button = PushButton("取消")
             self.cancel_button.clicked.connect(self.reject)
             button_layout.addWidget(self.cancel_button)
             
@@ -85,17 +80,14 @@ class SaveWorkflowDialog(QDialog):
         else:
             # 保存模式：显示输入框
             label = QLabel("请输入流程名称:")
-            label.setObjectName("SaveDialogLabel")
             
             # 名称输入框
             self.name_input = QLineEdit()
             self.name_input.setPlaceholderText("输入流程名称...")
-            self.name_input.setObjectName("WorkflowNameInput")
             self.name_input.textChanged.connect(self._on_text_changed)
             
             # 错误提示 label
             self.error_label = QLabel()
-            self.error_label.setStyleSheet("color: #ff6b6b;")
             self.error_label.setMinimumHeight(20)
             self.error_label.setText("")
             
@@ -104,14 +96,12 @@ class SaveWorkflowDialog(QDialog):
             button_layout.addStretch()
             
             # 确定按钮
-            self.ok_button = QPushButton("确定")
-            self.ok_button.setObjectName("SaveOkButton")
+            self.ok_button = PushButton("确定")
             self.ok_button.clicked.connect(self._on_ok_clicked)
             self.ok_button.setEnabled(False)
             
             # 取消按钮
-            self.cancel_button = QPushButton("取消")
-            self.cancel_button.setObjectName("SaveCancelButton")
+            self.cancel_button = PushButton("取消")
             self.cancel_button.clicked.connect(self.reject)
             
             # 添加按钮
@@ -233,7 +223,6 @@ class WorkflowManagerDialog(QDialog):
         # 设置对话框属性
         self.setWindowTitle("流程管理器")
         self.setMinimumSize(500, 450)
-        self.setObjectName("WorkflowManagerDialog")
         
         # 初始化 UI
         self._init_ui()
@@ -252,22 +241,18 @@ class WorkflowManagerDialog(QDialog):
         toolbar_layout.setSpacing(2)
         
         # 重命名按钮
-        self.rename_button = QPushButton("📝")
+        self.rename_button = PushButton("📝")
         self.rename_button.setToolTip("重命名")
         self.rename_button.setMinimumSize(50, 40)
         self.rename_button.setMaximumSize(50, 40)
-        self.rename_button.setObjectName("RenameButton")
-        self.rename_button.setStyleSheet("QPushButton { font-size: 20px; border: none; background: transparent; } QPushButton:hover { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }")
         self.rename_button.clicked.connect(self._on_rename_clicked)
         self.rename_button.setEnabled(False)  # 初始禁用
         
         # 删除按钮
-        self.delete_button = QPushButton("🗑️")
+        self.delete_button = PushButton("🗑️")
         self.delete_button.setToolTip("删除")
         self.delete_button.setMinimumSize(50, 40)
         self.delete_button.setMaximumSize(50, 40)
-        self.delete_button.setObjectName("DeleteButton")
-        self.delete_button.setStyleSheet("QPushButton { font-size: 20px; border: none; background: transparent; } QPushButton:hover { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }")
         self.delete_button.clicked.connect(self._on_delete_clicked)
         self.delete_button.setEnabled(False)  # 初始禁用
         
@@ -278,11 +263,9 @@ class WorkflowManagerDialog(QDialog):
         # ============= 列表区域 =============
         # 列表标签
         label = QLabel("流程列表:")
-        label.setObjectName("LoadDialogLabel")
         
         # 流程列表
         self.workflow_list = QListWidget()
-        self.workflow_list.setObjectName("WorkflowList")
         self.workflow_list.itemDoubleClicked.connect(self._on_item_double_clicked)
         
         # 填充列表
@@ -294,14 +277,12 @@ class WorkflowManagerDialog(QDialog):
         button_layout.addStretch()
         
         # 使用按钮
-        self.use_button = QPushButton("使用")
-        self.use_button.setObjectName("UseButton")
+        self.use_button = PushButton("使用")
         self.use_button.clicked.connect(self._on_use_clicked)
         self.use_button.setEnabled(False)  # 初始禁用
         
         # 取消按钮
-        self.cancel_button = QPushButton("取消")
-        self.cancel_button.setObjectName("CancelButton")
+        self.cancel_button = PushButton("取消")
         self.cancel_button.clicked.connect(self.reject)
         
         # 添加按钮
@@ -405,11 +386,11 @@ class WorkflowManagerDialog(QDialog):
         button_layout.addStretch()
         
         # 确定按钮
-        ok_button = QPushButton("确定")
+        ok_button = PushButton("确定")
         ok_button.setEnabled(False)
         
         # 取消按钮
-        cancel_button = QPushButton("取消")
+        cancel_button = PushButton("取消")
         cancel_button.clicked.connect(dialog.reject)
         
         button_layout.addWidget(ok_button)
@@ -482,7 +463,6 @@ class DeleteConfirmDialog(QDialog):
         # 设置对话框属性
         self.setWindowTitle("确认删除")
         self.setMinimumSize(350, 120)
-        self.setObjectName("DeleteConfirmDialog")
         
         # 初始化 UI
         self._init_ui()
@@ -498,21 +478,18 @@ class DeleteConfirmDialog(QDialog):
         
         # 提示标签
         label = QLabel(f"确定要删除流程 '{self.workflow_name}' 吗？")
-        label.setObjectName("DeleteDialogLabel")
         
         # 按钮区域
         button_layout = QHBoxLayout()
         button_layout.addStretch()
         
         # 确定按钮（在左侧）
-        ok_button = QPushButton("确定")
-        ok_button.setObjectName("DeleteOkButton")
+        ok_button = PushButton("确定")
         ok_button.clicked.connect(self.accept)
         button_layout.addWidget(ok_button)
         
         # 取消按钮（在右侧）
-        cancel_button = QPushButton("取消")
-        cancel_button.setObjectName("DeleteCancelButton")
+        cancel_button = PushButton("取消")
         cancel_button.clicked.connect(self.reject)
         button_layout.addWidget(cancel_button)
         

@@ -118,7 +118,7 @@ class TabContent(QWidget):
         # ============= 箭头按钮列表 =============
         self.button_list_widget = QFrame()
         self.button_list_widget.setMinimumHeight(60)  # 设置固定高度
-        self.button_list_widget.setFrameStyle(QFrame.StyledPanel | QFrame.Plain)  # 设置qt-material主题默认边框
+        self.button_list_widget.setFrameStyle(QFrame.StyledPanel | QFrame.Plain)
         self.button_list_layout = QHBoxLayout(self.button_list_widget)
         self.button_list_layout.setContentsMargins(10, 5, 10, 0)  # 右侧间隙10px
         self.button_list_layout.setSpacing(5)

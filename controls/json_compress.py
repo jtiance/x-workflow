@@ -5,7 +5,7 @@ JSON压缩控件模块
 """
 
 import json
-from PySide6.QtWidgets import QGridLayout, QLabel, QSizePolicy
+from PySide6.QtWidgets import QGridLayout, QLabel, QSizePolicy, QHBoxLayout
 from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
 
@@ -39,23 +39,33 @@ class JsonCompressControl(BaseControl):
         grid_layout.setSpacing(5)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
-        # 第1行：按键名排序
+        # 第1行：按键名排序和确保ASCII（同一列中并列排放）
+        # 创建水平布局
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        button_layout.setAlignment(Qt.AlignLeft)
+        
+        # 按键名排序
         self.sort_checkbox = CheckablePushButton("排序")
         self.sort_checkbox.setChecked(False)
         self.sort_checkbox.setToolTip("按键名排序")
         self.sort_checkbox.clicked.connect(self._emit_parameters_changed)
         self.sort_checkbox.setFixedWidth(60)
+        button_layout.addWidget(self.sort_checkbox)
         
-        grid_layout.addWidget(self.sort_checkbox, 0, 1)  # 放在第二列
-        
-        # 第2行：确保ASCII
+        # 确保ASCII
         self.ascii_checkbox = CheckablePushButton("ASCII")
         self.ascii_checkbox.setChecked(False)
         self.ascii_checkbox.setToolTip("确保ASCII（转义非ASCII字符）")
         self.ascii_checkbox.clicked.connect(self._emit_parameters_changed)
         self.ascii_checkbox.setFixedWidth(60)
+        button_layout.addWidget(self.ascii_checkbox)
         
-        grid_layout.addWidget(self.ascii_checkbox, 1, 1)  # 放在第二列
+        # 在按钮右侧添加弹性空间，确保按钮靠左对齐
+        button_layout.addStretch()
+        
+        # 将水平布局添加到网格布局的同一列
+        grid_layout.addLayout(button_layout, 0, 1)
         
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)

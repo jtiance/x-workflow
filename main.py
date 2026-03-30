@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 X-Workflow 主程序入口
-一个基于 PySide6 和 qt-material 的可视化流程编辑器
+一个基于 PySide6 和 PySide6-Fluent-Widgets 的可视化流程编辑器
 """
 
 import sys
@@ -10,7 +10,7 @@ import shutil
 from pathlib import Path
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Qt
-from qt_material import apply_stylesheet
+from qfluentwidgets import setTheme, Theme
 
 from widgets.main_window import MainWindow
 
@@ -79,16 +79,26 @@ def main():
     if icon_path.exists():
         app.setWindowIcon(QIcon(str(icon_path)))
     
-    # 应用 qt-material 样式
-    # 可选主题: 'dark_amber.xml', 'dark_blue.xml', 'dark_cyan.xml', 'dark_lightgreen.xml',
-    #           'dark_pink.xml', 'dark_purple.xml', 'dark_red.xml', 'dark_teal.xml',
-    #           'dark_yellow.xml', 'light_amber.xml', 'light_blue.xml', 'light_cyan.xml',
-    #           'light_cyan_500.xml', 'light_lightgreen.xml', 'light_pink.xml', 'light_purple.xml',
-    #           'light_red.xml', 'light_teal.xml', 'light_yellow.xml'
-    apply_stylesheet(app, theme='dark_lightgreen.xml')
+    # 应用 Fluent Design 主题 - 必须在创建任何窗口之前调用
+    # 可选主题: Theme.LIGHT, Theme.DARK, Theme.AUTO
+    setTheme(Theme.DARK)
     
-    # 创建并显示主窗口（MainWindow 中已设置最大化）
+    # 创建主窗口
     window = MainWindow()
+    
+    # 手动设置深色背景（确保 qfluentwidgets 组件外的区域也是深色）
+    window.setStyleSheet("""
+        QMainWindow {
+            background-color: #272727;
+        }
+        QWidget {
+            background-color: #272727;
+            color: #ffffff;
+        }
+        QLabel {
+            color: #ffffff;
+        }
+    """)
     
     # 运行应用程序主循环
     sys.exit(app.exec())
