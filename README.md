@@ -1,6 +1,6 @@
 # X-Workflow
 
-一个基于 PySide6 和 qt-material 的可视化工作流编辑器，支持文本处理流程的可视化编排、保存和管理。
+一个基于 PySide6 和 PySide6-Fluent-Widgets 的可视化工作流编辑器，支持文本处理流程的可视化编排、保存和管理。
 
 ## 环境要求
 
@@ -53,7 +53,7 @@ poetry install
 
 ## 运行项目
 
-1. 使用 Poetry 运行程序：
+使用 Poetry 运行程序：
 
 ```bash
 poetry run python main.py
@@ -66,8 +66,6 @@ poetry shell
 python main.py
 ```
 
-<br />
-
 ## 打包发布
 
 使用 PyInstaller 打包成可执行文件：
@@ -78,7 +76,7 @@ poetry run pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --a
 
 打包完成后，可执行文件位于 `dist/X-Workflow` 目录下。
 
-<br />
+---
 
 ## 项目结构
 
@@ -86,6 +84,7 @@ poetry run pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --a
 x-workflow/
 ├── main.py                      # 程序入口
 ├── workflow_manager.py          # 工作流配置管理器
+├── pyproject.toml               # Poetry 配置文件
 ├── widgets/                     # GUI 组件
 │   ├── __init__.py
 │   ├── main_window.py          # 主窗口
@@ -95,6 +94,13 @@ x-workflow/
 │   ├── control_dialog.py       # 控件选择对话框
 │   ├── workflow_dialogs.py     # 工作流保存/加载/管理对话框
 │   └── arrow_button.py         # 箭头按钮组件
+├── components/                   # 自定义组件
+│   ├── custom_edit_layer.py   # 自定义编辑层（无边条）
+│   ├── custom_text_edit.py     # 自定义文本编辑器
+│   ├── custom_tab_bar.py       # 自定义标签栏
+│   ├── custom_tab_item.py     # 自定义标签项
+│   ├── custom_buttons.py       # 自定义按钮
+│   └── syntax_highlighter.py   # 语法高亮器
 ├── controls/                    # 流程控件
 │   ├── __init__.py
 │   ├── base_control.py         # 控件基类
@@ -102,6 +108,8 @@ x-workflow/
 │   ├── text_search_delete.py   # 文本搜索删除控件
 │   ├── json_format.py          # JSON格式化控件
 │   ├── json_compress.py        # JSON压缩控件
+│   ├── html_format.py          # HTML格式化控件
+│   ├── xml_format.py           # XML格式化控件
 │   ├── add_text.py             # 增加文本控件
 │   ├── add_prefix.py           # 增加前缀控件
 │   ├── add_suffix.py           # 增加后缀控件
@@ -119,7 +127,7 @@ x-workflow/
 ### 1. 多标签页工作区
 
 - 支持同时打开多个标签页，每个标签页独立工作
-- 新建标签页默认命名为"\未命名"
+- 新建标签页默认命名为"未命名"
 - 标签页可关闭（至少保留一个）
 - 快捷键支持：
   - `Ctrl+T`：新建标签页
@@ -132,7 +140,7 @@ x-workflow/
 
 - 左侧控制面板：添加、配置和管理处理控件
 - 右侧文本编辑器：输入和显示文本内容
-- 支持添加多个控件，按顺序执行
+- 支持添加多个控件，按顺序
 - 上一个控件的输出作为下一个控件的输入
 
 ### 3. 菜单栏
@@ -166,69 +174,85 @@ x-workflow/
   - **取消**：关闭流程管理器
 - 支持双击列表项快速使用工作流
 
+### 7. 语法高亮支持
+
+- 支持多种编程语言的语法高亮（基于 Pygments）
+- 自动根据语言类型应用高亮样式
+- 支持纯文本模式（无高亮）
+
 ## 控件说明
 
-### 文本替换 (text\_replace)
+### 文本替换 (text_replace)
 
 - **功能**：在文本中查找并替换指定内容
 - **参数**：查找文本、替换文本
 
-### 文本搜索删除 (text\_search\_delete)
+### 文本搜索删除 (text_search_delete)
 
 - **功能**：查找包含或不含特定文本的行并删除
 - **参数**：查询文本、匹配模式、删除模式、区分大小写、是否使用正则表达式
 
-### JSON格式化 (json\_format)
+### JSON格式化 (json_format)
 
 - **功能**：格式化 JSON 文本
 - **参数**：缩进空格数、是否按键名排序、确保ASCII
 
-### JSON压缩 (json\_compress)
+### JSON压缩 (json_compress)
 
 - **功能**：压缩 JSON 文本（移除空白）
 - **参数**：是否按键名排序
 
-### 增加文本 (add\_text)
+### HTML格式化 (html_format)
+
+- **功能**：格式化 HTML 文本
+- **参数**：缩进空格数
+
+### XML格式化 (xml_format)
+
+- **功能**：格式化 XML 文本
+- **参数**：缩进空格数
+
+### 增加文本 (add_text)
 
 - **功能**：在文本指定位置增加内容
 - **参数**：操作类型（增加前缀/后缀/指定位置）、增加的文本
 
-### 增加前缀 (add\_prefix)
+### 增加前缀 (add_prefix)
 
 - **功能**：在每行开头增加指定文本
 - **参数**：前缀文本
 
-### 增加后缀 (add\_suffix)
+### 增加后缀 (add_suffix)
 
 - **功能**：在每行末尾增加指定文本
 - **参数**：后缀文本
 
-### 大小写转换 (case\_convert)
+### 大小写转换 (case_convert)
 
-- **功能**：转换文本的大小写
+- **功能**：：转换文本的大小写
 - **参数**：转换类型（大写、小写、首字母大写、句首大写、切换大小写）
 
-### 文本分割 (text\_split)
+### 文本分割 (text_split)
 
 - **功能**：按分隔符或长度分割文本
 - **参数**：分割模式、分隔符、字符数
 
-### 文本合并 (text\_merge)
+### 文本合并 (text_merge)
 
 - **功能**：合并多行文本
 - **参数**：合并方式（用分隔符连接、去重后合并）、分隔符
 
-### 移除重复行 (remove\_duplicate)
+### 移除重复行 (remove_duplicate)
 
 - **功能**：移除文本中的重复行
 - **参数**：模式（保留首次出现/保留最后一次出现）、忽略大小写、忽略空行
 
-### 移除空行 (remove\_empty\_lines)
+### 移除空行 (remove_empty_lines)
 
 - **功能**：移除文本中的空行
 - **参数**：移除模式（移除所有空行、仅移除空白字符行、仅移除完全空行）
 
-### 文本裁剪 (text\_trim)
+### 文本裁剪 (text_trim)
 
 - **功能**：根据匹配字符串裁剪文本
 - **参数**：匹配字符串、裁剪方向（裁剪掉左侧的字符串/裁剪掉右侧的字符串）、是否裁剪匹配的文本
@@ -265,14 +289,23 @@ x-workflow/
 ## 技术特点
 
 - **基于 PySide6**：跨平台 GUI 框架
-- **qt-material**：Material Design 风格主题
+- **PySide6-Fluent-Widgets**：Fluent Design 风格主题
 - **JSON 配置**：易于理解和编辑的配置格式
 - **多标签页**：支持并行处理多个任务
 - **可视化编排**：直观的点击添加式工作流设计
+- **语法高亮**：支持多种编程语言的高亮显示
 
-<br />
+---
 
 ## 版本历史
+
+### v1.4.0
+
+- 新增"HTML格式化"控件
+- 新增"XML格式化"控件
+- 新增语法高亮功能
+- 优化文本编辑器样式（统一样式，无边条）
+- 自定义组件架构（components/ 目录）
 
 ### v1.3.0
 
@@ -302,9 +335,11 @@ x-workflow/
 - 多标签页支持
 - 快捷键支持
 
+---
+
 #### Mac上构建图标
 
-```
+```bash
 sips -z 16 16 X-Workflow.png --out ~/Desktop/icon.iconset/icon_16x16.png
 sips -z 32 32 X-Workflow.png --out ~/Desktop/icon.iconset/icon_16x16@2x.png
 sips -z 32 32 X-Workflow.png --out ~/Desktop/icon.iconset/icon_32x32.png
@@ -319,6 +354,4 @@ sips -z 512 512 X-Workflow.png --out ~/Desktop/icon.iconset/icon_512x512.png
 sips -z 1024 1024 X-Workflow.png --out ~/Desktop/icon.iconset/icon_512x512@2x.png
 
 iconutil -c icns ~/Desktop/icon.iconset -o ~/Desktop/X-Workflow.icns
-
 ```
-
