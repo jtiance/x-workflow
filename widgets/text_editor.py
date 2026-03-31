@@ -4,15 +4,14 @@
 提供带行号的代码编辑功能
 """
 
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QTextEdit
 from PySide6.QtCore import Qt, Signal, QRect, QSize
 from PySide6.QtGui import QPainter, QColor, QTextFormat
-
-# 导入 qfluentwidgets 的 PlainTextEdit
-from qfluentwidgets import PlainTextEdit as FluentPlainTextEdit
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QTextEdit
+# 导入自定义 PlainTextEdit
+from components.custom_text_edit import CustomPlainTextEdit
 
 # 导入语法高亮器
-from components.syntax_highlighter import PygmentsHighlighter, SyntaxHighlighterFactory
+from components.syntax_highlighter import PygmentsHighlighter
 
 
 class LineNumberArea(QWidget):
@@ -188,7 +187,7 @@ class TextEditor(QWidget):
         return self.text_edit.get_language()
 
 
-class CodeEditor(FluentPlainTextEdit):
+class CodeEditor(CustomPlainTextEdit):
     """
     带行号的代码编辑器
     """

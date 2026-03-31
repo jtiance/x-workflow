@@ -7,7 +7,7 @@
 from PySide6.QtCore import Signal, Qt, QMimeData
 from PySide6.QtGui import QDrag
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QSizePolicy, QHBoxLayout, QPushButton
-from qfluentwidgets import SubtitleLabel
+from qfluentwidgets import SubtitleLabel, StrongBodyLabel
 
 
 class BaseControl(QWidget):
@@ -73,6 +73,12 @@ class BaseControl(QWidget):
             QGroupBox {
                 margin-top: 0px;
                 padding-top: 5px;
+                background-color: #222222;
+                border: 1px solid #4a4a4a;
+                border-radius: 4px;
+            }
+            QGroupBox QWidget {
+                background-color: #222222;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
@@ -93,7 +99,7 @@ class BaseControl(QWidget):
         title_layout.setSpacing(5)
         
         # 创建标题标签
-        self.title_label = SubtitleLabel(self._title)
+        self.title_label = StrongBodyLabel(self._title)
 
         # 创建操作按钮容器
         button_container = QWidget()
@@ -161,7 +167,7 @@ class BaseControl(QWidget):
         """
         初始化内容区域
         子类需要重写此方法来添加自己的控件
-        
+
         Returns:
             QVBoxLayout: 内容布局，子类可以在此添加控件
         """

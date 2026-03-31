@@ -106,6 +106,7 @@ class ControlPanel(QWidget):
         
         # 创建滚动区域的内容容器
         self.scroll_content = QWidget()
+        self.scroll_content.setStyleSheet("background-color: #333333;")  # 深灰色背景
         self.scroll_layout = QVBoxLayout(self.scroll_content)
         self.scroll_layout.setContentsMargins(5, 5, 5, 5)
         self.scroll_layout.setSpacing(10)
