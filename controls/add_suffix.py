@@ -4,8 +4,9 @@
 提供为文本每一行增加后缀的功能
 """
 
-from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QSizePolicy
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout, QSizePolicy
+from qfluentwidgets import BodyLabel, LineEdit
 
 from controls.base_control import BaseControl
 
@@ -38,11 +39,11 @@ class AddSuffixControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：后缀
-        suffix_label = QLabel("后缀:")
+        suffix_label = BodyLabel("后缀:")
         suffix_label.setMinimumWidth(70)
         suffix_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.suffix_input = QLineEdit()
+        self.suffix_input = LineEdit()
         self.suffix_input.setPlaceholderText("输入要添加的后缀...")
         self.suffix_input.textChanged.connect(self._emit_parameters_changed)
         self.suffix_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

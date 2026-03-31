@@ -4,8 +4,9 @@
 提供根据匹配字符串裁剪文本的功能
 """
 
-from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QLineEdit)
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout
+from qfluentwidgets import BodyLabel, LineEdit, ComboBox
 
 from controls.base_control import BaseControl
 
@@ -37,24 +38,22 @@ class TextTrimControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第 1 行：匹配字符串
-        match_label = QLabel("匹配字符串:")
+        match_label = BodyLabel("匹配字符串:")
         match_label.setMinimumWidth(70)
         match_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.match_edit = QLineEdit()
+        self.match_edit = LineEdit()
         self.match_edit.textChanged.connect(self._emit_parameters_changed)
         
         grid_layout.addWidget(match_label, 0, 0)
         grid_layout.addWidget(self.match_edit, 0, 1)
         
         # 第 2 行：裁剪方向
-        direction_label = QLabel("裁剪方向:")
+        direction_label = BodyLabel("裁剪方向:")
         direction_label.setMinimumWidth(70)
         direction_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.direction_combo = QComboBox()
-        self.direction_combo.setEditable(True)
-        self.direction_combo.lineEdit().setReadOnly(True)
+        self.direction_combo = ComboBox()
         self.direction_combo.addItem("裁剪掉左侧的字符串", "before")
         self.direction_combo.addItem("裁剪掉右侧的字符串", "after")
         self.direction_combo.currentIndexChanged.connect(self._emit_parameters_changed)
@@ -63,13 +62,11 @@ class TextTrimControl(BaseControl):
         grid_layout.addWidget(self.direction_combo, 1, 1)
         
         # 第 3 行：是否裁剪匹配的文本
-        include_label = QLabel("裁剪匹配的文本:")
+        include_label = BodyLabel("裁剪匹配的文本:")
         include_label.setMinimumWidth(70)
         include_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.include_combo = QComboBox()
-        self.include_combo.setEditable(True)
-        self.include_combo.lineEdit().setReadOnly(True)
+        self.include_combo = ComboBox()
         self.include_combo.addItem("是", False)
         self.include_combo.addItem("否", True)
         self.include_combo.currentIndexChanged.connect(self._emit_parameters_changed)

@@ -4,12 +4,11 @@
 提供按不同方式分割文本的功能
 """
 
-from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QLineEdit, 
-                              QSpinBox, QSizePolicy)
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QGridLayout, QSizePolicy)
+from qfluentwidgets import ComboBox, BodyLabel, LineEdit, SpinBox
 
 from controls.base_control import BaseControl
-
 
 DELIMITER_MAP = {
     "逗号": ",",
@@ -49,13 +48,11 @@ class TextSplitControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：分割模式
-        mode_label = QLabel("模式:")
+        mode_label = BodyLabel("模式:")
         mode_label.setMinimumWidth(70)
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.mode_combo = QComboBox()
-        self.mode_combo.setEditable(True)
-        self.mode_combo.lineEdit().setReadOnly(True)
+        self.mode_combo = ComboBox()
         self.mode_combo.addItems(["按分隔符分割", "按长度分割"])
         self.mode_combo.currentTextChanged.connect(self._on_mode_changed)
         self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
@@ -65,13 +62,11 @@ class TextSplitControl(BaseControl):
         grid_layout.addWidget(self.mode_combo, 0, 1)
         
         # 第2行：分隔符
-        delimiter_label = QLabel("分隔符:")
+        delimiter_label = BodyLabel("分隔符:")
         delimiter_label.setMinimumWidth(70)
         delimiter_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.delimiter_combo = QComboBox()
-        self.delimiter_combo.setEditable(True)
-        self.delimiter_combo.lineEdit().setReadOnly(True)
+        self.delimiter_combo = ComboBox()
         self.delimiter_combo.addItems(list(DELIMITER_MAP.keys()))
         self.delimiter_combo.setCurrentText("逗号")
         self.delimiter_combo.currentTextChanged.connect(self._on_delimiter_changed)
@@ -82,7 +77,7 @@ class TextSplitControl(BaseControl):
         grid_layout.addWidget(self.delimiter_combo, 1, 1)
         
         # 第3行：自定义分隔符输入框
-        self.custom_delimiter_input = QLineEdit()
+        self.custom_delimiter_input = LineEdit()
         self.custom_delimiter_input.setPlaceholderText("请输入自定义分隔符")
         self.custom_delimiter_input.setVisible(False)
         self.custom_delimiter_input.textChanged.connect(self._emit_parameters_changed)
@@ -91,11 +86,11 @@ class TextSplitControl(BaseControl):
         grid_layout.addWidget(self.custom_delimiter_input, 2, 1)  # 放在第二列
         
         # 第4行：字符数
-        length_label = QLabel("字符数:")
+        length_label = BodyLabel("字符数:")
         length_label.setMinimumWidth(70)
         length_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.length_spin = QSpinBox()
+        self.length_spin = SpinBox()
         self.length_spin.setMinimum(1)
         self.length_spin.setMaximum(10000)
         self.length_spin.setValue(10)

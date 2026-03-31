@@ -6,8 +6,8 @@
 
 import re
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGridLayout, QLabel, QSizePolicy, QHBoxLayout
-from qfluentwidgets import LineEdit, TogglePushButton
+from PySide6.QtWidgets import QGridLayout, QSizePolicy, QHBoxLayout
+from qfluentwidgets import LineEdit, TogglePushButton, BodyLabel
 
 from controls.base_control import BaseControl
 
@@ -40,7 +40,7 @@ class TextReplaceControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：查找
-        find_label = QLabel("查找:")
+        find_label = BodyLabel("查找:")
         find_label.setMinimumWidth(70)
         find_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
@@ -92,7 +92,7 @@ class TextReplaceControl(BaseControl):
         grid_layout.addLayout(find_options_layout, 1, 1)
         
         # 第3行：替换
-        replace_label = QLabel("替换:")
+        replace_label = BodyLabel("替换:")
         replace_label.setMinimumWidth(70)
         replace_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         

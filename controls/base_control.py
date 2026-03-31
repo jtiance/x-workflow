@@ -4,9 +4,10 @@
 所有流程控件的基类，提供通用功能
 """
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QSizePolicy, QHBoxLayout, QPushButton, QLabel
 from PySide6.QtCore import Signal, Qt, QMimeData
 from PySide6.QtGui import QDrag
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QSizePolicy, QHBoxLayout, QPushButton
+from qfluentwidgets import SubtitleLabel
 
 
 class BaseControl(QWidget):
@@ -92,9 +93,8 @@ class BaseControl(QWidget):
         title_layout.setSpacing(5)
         
         # 创建标题标签
-        self.title_label = QLabel(self._title)
-        self.title_label.setStyleSheet("font-weight: bold; font-size: 14px;")
-        
+        self.title_label = SubtitleLabel(self._title)
+
         # 创建操作按钮容器
         button_container = QWidget()
         button_layout = QHBoxLayout(button_container)

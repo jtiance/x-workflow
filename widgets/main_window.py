@@ -461,7 +461,17 @@ class MainWindow(QMainWindow):
             from controls.text_trim import TextTrimControl
             control = TextTrimControl()
             tab_content.add_control(control)
-            
+
+        elif control_type == "xml_format":
+            from controls.xml_format import XmlFormatControl
+            control = XmlFormatControl()
+            tab_content.add_control(control)
+
+        elif control_type == "html_format":
+            from controls.html_format import HtmlFormatControl
+            control = HtmlFormatControl()
+            tab_content.add_control(control)
+
     def _show_about(self):
         """
         显示关于对话框

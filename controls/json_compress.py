@@ -5,9 +5,10 @@ JSON压缩控件模块
 """
 
 import json
-from PySide6.QtWidgets import QGridLayout, QLabel, QSizePolicy, QHBoxLayout
-from components.custom_buttons import CheckablePushButton
+
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout, QHBoxLayout
+from qfluentwidgets import TogglePushButton
 
 from controls.base_control import BaseControl
 
@@ -46,7 +47,7 @@ class JsonCompressControl(BaseControl):
         button_layout.setAlignment(Qt.AlignLeft)
         
         # 按键名排序
-        self.sort_checkbox = CheckablePushButton("排序")
+        self.sort_checkbox = TogglePushButton("排序")
         self.sort_checkbox.setChecked(False)
         self.sort_checkbox.setToolTip("按键名排序")
         self.sort_checkbox.clicked.connect(self._emit_parameters_changed)
@@ -54,7 +55,7 @@ class JsonCompressControl(BaseControl):
         button_layout.addWidget(self.sort_checkbox)
         
         # 确保ASCII
-        self.ascii_checkbox = CheckablePushButton("ASCII")
+        self.ascii_checkbox = TogglePushButton("ASCII")
         self.ascii_checkbox.setChecked(False)
         self.ascii_checkbox.setToolTip("确保ASCII（转义非ASCII字符）")
         self.ascii_checkbox.clicked.connect(self._emit_parameters_changed)

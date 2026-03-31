@@ -4,8 +4,9 @@
 提供英文字母大小写转换功能
 """
 
-from PySide6.QtWidgets import QGridLayout, QLabel, QComboBox, QSizePolicy
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout, QLabel, QSizePolicy
+from qfluentwidgets import ComboBox, BodyLabel
 
 from controls.base_control import BaseControl
 
@@ -38,13 +39,11 @@ class CaseConvertControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：转换模式
-        mode_label = QLabel("转换为:")
+        mode_label = BodyLabel("转换为:")
         mode_label.setMinimumWidth(70)
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.mode_combo = QComboBox()
-        self.mode_combo.setEditable(True)
-        self.mode_combo.lineEdit().setReadOnly(True)
+        self.mode_combo = ComboBox()
         self.mode_combo.addItems([
             "全部大写",
             "全部小写",

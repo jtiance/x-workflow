@@ -4,10 +4,9 @@
 基于特定文本查询每行，找到匹配行后进行删除操作
 """
 
-from PySide6.QtWidgets import (QGridLayout, QLabel, QLineEdit, QComboBox, 
-                              QSizePolicy)
-from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QGridLayout, QSizePolicy)
+from qfluentwidgets import ComboBox, BodyLabel, TogglePushButton, LineEdit
 
 from controls.base_control import BaseControl
 
@@ -40,11 +39,11 @@ class TextSearchDeleteControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：查询文本
-        search_label = QLabel("查询文本:")
+        search_label = BodyLabel("查询文本:")
         search_label.setMinimumWidth(70)
         search_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.search_input = QLineEdit()
+        self.search_input = LineEdit()
         self.search_input.setPlaceholderText("输入要查询的文本...")
         self.search_input.textChanged.connect(self._emit_parameters_changed)
         self.search_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -60,14 +59,14 @@ class TextSearchDeleteControl(BaseControl):
         button_layout.setSpacing(5)
         
         # 区分大小写按钮
-        self.case_checkbox = CheckablePushButton("Aa")
+        self.case_checkbox = TogglePushButton("Aa")
         self.case_checkbox.setChecked(False)
         self.case_checkbox.setToolTip("区分大小写")
         self.case_checkbox.clicked.connect(self._emit_parameters_changed)
         self.case_checkbox.setFixedWidth(40)
         
         # 使用正则表达式按钮
-        self.regex_checkbox = CheckablePushButton("RE")
+        self.regex_checkbox = TogglePushButton("RE")
         self.regex_checkbox.setChecked(False)
         self.regex_checkbox.setToolTip("使用正则表达式")
         self.regex_checkbox.clicked.connect(self._emit_parameters_changed)
@@ -82,13 +81,11 @@ class TextSearchDeleteControl(BaseControl):
         grid_layout.addLayout(button_layout, 1, 1)  # 放在第二列
         
         # 第3行：匹配模式
-        match_label = QLabel("匹配模式:")
+        match_label = BodyLabel("匹配模式:")
         match_label.setMinimumWidth(70)
         match_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.match_combo = QComboBox()
-        self.match_combo.setEditable(True)
-        self.match_combo.lineEdit().setReadOnly(True)
+        self.match_combo = ComboBox()
         self.match_combo.addItems(["包含文本", "不包含文本"])
         self.match_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.match_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -97,13 +94,11 @@ class TextSearchDeleteControl(BaseControl):
         grid_layout.addWidget(self.match_combo, 2, 1)
         
         # 第4行：删除模式
-        delete_label = QLabel("删除模式:")
+        delete_label = BodyLabel("删除模式:")
         delete_label.setMinimumWidth(70)
         delete_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.delete_combo = QComboBox()
-        self.delete_combo.setEditable(True)
-        self.delete_combo.lineEdit().setReadOnly(True)
+        self.delete_combo = ComboBox()
         self.delete_combo.addItems(["删除匹配行", "删除非匹配行"])
         self.delete_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.delete_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

@@ -143,6 +143,8 @@ class ControlDialog(QDialog):
             ("文本替换", "text_replace"),
             ("JSON格式化", "json_format"),
             ("JSON压缩", "json_compress"),
+            ("XML格式化", "xml_format"),
+            ("HTML格式化", "html_format"),
             ("增加文本", "add_text"),
             ("大小写转换", "case_convert"),
             ("文本分割", "text_split"),
@@ -262,7 +264,43 @@ class ControlDialog(QDialog):
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
+        elif control_type == "xml_format":
+            # XML格式化控件预览
+            from controls.xml_format import XmlFormatControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = XmlFormatControl()
+            preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 设置一些示例数据
+            preview_control.set_indent(2)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
+        elif control_type == "html_format":
+            # HTML格式化控件预览
+            from controls.html_format import HtmlFormatControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = HtmlFormatControl()
+            preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 设置一些示例数据
+            preview_control.set_indent(2)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
         elif control_type == "add_text":
             # 增加文本控件预览
             from controls.add_text import AddTextControl

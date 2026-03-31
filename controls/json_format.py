@@ -5,9 +5,10 @@ JSON格式化控件模块
 """
 
 import json
-from PySide6.QtWidgets import QGridLayout, QLabel, QSpinBox, QSizePolicy, QHBoxLayout
-from components.custom_buttons import CheckablePushButton
+
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout, QSizePolicy, QHBoxLayout
+from qfluentwidgets import BodyLabel, SpinBox, TogglePushButton
 
 from controls.base_control import BaseControl
 
@@ -40,11 +41,11 @@ class JsonFormatControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：缩进
-        indent_label = QLabel("缩进:")
+        indent_label = BodyLabel("缩进:")
         indent_label.setMinimumWidth(70)
         indent_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.indent_spin = QSpinBox()
+        self.indent_spin = SpinBox()
         self.indent_spin.setMinimum(0)
         self.indent_spin.setMaximum(8)
         self.indent_spin.setValue(4)
@@ -62,7 +63,7 @@ class JsonFormatControl(BaseControl):
         button_layout.setAlignment(Qt.AlignLeft)  # 设置按钮靠左对齐
         
         # 按键名排序
-        self.sort_checkbox = CheckablePushButton("排序")
+        self.sort_checkbox = TogglePushButton("排序")
         self.sort_checkbox.setChecked(False)
         self.sort_checkbox.setToolTip("按键名排序")
         self.sort_checkbox.clicked.connect(self._emit_parameters_changed)
@@ -70,7 +71,7 @@ class JsonFormatControl(BaseControl):
         button_layout.addWidget(self.sort_checkbox)
         
         # 确保ASCII
-        self.ascii_checkbox = CheckablePushButton("ASCII")
+        self.ascii_checkbox = TogglePushButton("ASCII")
         self.ascii_checkbox.setChecked(False)
         self.ascii_checkbox.setToolTip("确保ASCII（转义非ASCII字符）")
         self.ascii_checkbox.clicked.connect(self._emit_parameters_changed)

@@ -4,8 +4,9 @@
 提供为文本每一行增加前缀、后缀或前后缀的功能
 """
 
-from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QSizePolicy
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout, QSizePolicy
+from qfluentwidgets import BodyLabel, LineEdit, ComboBox
 
 from controls.base_control import BaseControl
 
@@ -38,13 +39,11 @@ class AddTextControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第1行：操作类型
-        type_label = QLabel("操作类型:")
+        type_label = BodyLabel("操作类型:")
         type_label.setMinimumWidth(70)
         type_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.type_combo = QComboBox()
-        self.type_combo.setEditable(True)
-        self.type_combo.lineEdit().setReadOnly(True)
+        self.type_combo = ComboBox()
         self.type_combo.addItems(["增加前缀", "增加后缀", "增加前后缀"])
         self.type_combo.currentIndexChanged.connect(self._emit_parameters_changed)
         self.type_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -53,11 +52,11 @@ class AddTextControl(BaseControl):
         grid_layout.addWidget(self.type_combo, 0, 1)
         
         # 第2行：文本
-        text_label = QLabel("文本:")
+        text_label = BodyLabel("文本:")
         text_label.setMinimumWidth(70)
         text_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        
-        self.text_input = QLineEdit()
+
+        self.text_input = LineEdit()
         self.text_input.setPlaceholderText("输入要添加的文本...")
         self.text_input.textChanged.connect(self._emit_parameters_changed)
         self.text_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

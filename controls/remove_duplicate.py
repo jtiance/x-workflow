@@ -4,10 +4,11 @@
 提供移除文本中重复行的功能
 """
 
-from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QSizePolicy)
-from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QGridLayout, QSizePolicy)
+from qfluentwidgets import ComboBox, BodyLabel
 
+from components.custom_buttons import CheckablePushButton
 from controls.base_control import BaseControl
 
 
@@ -37,13 +38,11 @@ class RemoveDuplicateControl(BaseControl):
         grid_layout.setSpacing(5)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
-        mode_label = QLabel("模式:")
+        mode_label = BodyLabel("模式:")
         mode_label.setMinimumWidth(70)
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.mode_combo = QComboBox()
-        self.mode_combo.setEditable(True)
-        self.mode_combo.lineEdit().setReadOnly(True)
+        self.mode_combo = ComboBox()
         self.mode_combo.addItems(["保留首次出现", "保留最后一次出现"])
         self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.mode_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

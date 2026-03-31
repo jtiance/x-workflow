@@ -4,9 +4,9 @@
 提供移除文本中空行的功能
 """
 
-from PySide6.QtWidgets import (QGridLayout, QLabel, QComboBox, QSizePolicy)
-from components.custom_buttons import CheckablePushButton
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QGridLayout, QSizePolicy)
+from qfluentwidgets import ComboBox, BodyLabel
 
 from controls.base_control import BaseControl
 
@@ -38,13 +38,11 @@ class RemoveEmptyLinesControl(BaseControl):
         grid_layout.setContentsMargins(0, 0, 0, 0)
         
         # 第 1 行：移除模式
-        mode_label = QLabel("移除模式:")
+        mode_label = BodyLabel("移除模式:")
         mode_label.setMinimumWidth(70)
         mode_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
-        self.mode_combo = QComboBox()
-        self.mode_combo.setEditable(True)
-        self.mode_combo.lineEdit().setReadOnly(True)
+        self.mode_combo = ComboBox()
         self.mode_combo.addItems(["移除所有空行", "仅移除空白字符行", "仅移除完全空行"])
         self.mode_combo.setCurrentText("移除所有空行")
         self.mode_combo.currentTextChanged.connect(self._emit_parameters_changed)
