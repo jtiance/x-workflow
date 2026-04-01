@@ -119,7 +119,7 @@ class ControlPanel(QWidget):
         # 创建按钮容器
         button_widget = QWidget()
         button_layout = QHBoxLayout(button_widget)
-        button_layout.setContentsMargins(0, 0, 0, 0)
+        button_layout.setContentsMargins(0, 15, 0, 0)  # 上边距15px
         button_layout.setSpacing(5)
         
         # 创建执行按钮

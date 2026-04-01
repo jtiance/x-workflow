@@ -94,7 +94,7 @@ class TabContent(QWidget):
         """
         # 创建主布局（垂直布局）
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setContentsMargins(0, 15, 0, 0)  # 上边距15px
         main_layout.setSpacing(0)
         
         # 创建右侧容器（包含文本编辑器和按钮列表）
@@ -450,7 +450,7 @@ class TabContent(QWidget):
         if is_error:
             self.status_label.setStyleSheet("padding-left: 10px; color: #ff6b6b;")
         else:
-            self.status_label.setStyleSheet("padding-left: 10px; color: #51cf66;")
+            self.status_label.setStyleSheet("padding-left: 10px; color: white;")
         
     def get_control_panel(self):
         """
