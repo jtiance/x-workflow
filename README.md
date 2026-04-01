@@ -2,6 +2,16 @@
 
 一个基于 PySide6 和 PySide6-Fluent-Widgets 的可视化工作流编辑器，支持文本处理流程的可视化编排、保存和管理。
 
+## 许可证
+
+本项目采用 **GNU General Public License v3.0** 协议。
+
+由于项目依赖了 **PySide6-Fluent-Widgets**（GPL v3 协议），根据 GPL 的传染性，本项目也采用 GPL v3 协议。
+
+完整的许可证文本请参见项目根目录下的 [LICENSE](LICENSE) 文件。
+
+---
+
 ## 环境要求
 
 - Python 3.10+
