@@ -6,13 +6,58 @@
 
 import json
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QSplitter, QVBoxLayout, QLabel, QFileDialog, QApplication, QFrame
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QThread, QObject
 
 from widgets.control_panel import ControlPanel
 from widgets.text_editor import TextEditor
 from widgets.workflow_dialogs import SaveWorkflowDialog, WorkflowManagerDialog
 from widgets.arrow_button import ArrowButton
 from workflow_manager import get_workflow_manager
+
+
+class ProcessWorker(QObject):
+    """
+    后台处理工作线程
+    """
+    # 定义信号
+    finished = Signal(str)  # 处理完成，返回结果文本
+    intermediate_result = Signal(int, str)  # 中间结果 (index, text)
+    progress = Signal(int, int)  # 进度更新 (current, total)
+    error = Signal(str)  # 错误信号
+
+    def __init__(self, controls, text):
+        super().__init__()
+        self.controls = controls
+        self.text = text
+
+    def run(self):
+        """
+        执行处理
+        """
+        try:
+            result_text = self.text
+            total = len(self.controls)
+
+            for i, control in enumerate(self.controls):
+                # 检查控件是否被禁用
+                if hasattr(control, 'is_disabled') and control.is_disabled():
+                    continue
+
+                # 检查控件是否有 execute 方法
+                if hasattr(control, 'execute'):
+                    result_text = control.execute(result_text)
+
+                    # 发出中间结果信号（仅缓存前10个步骤的结果，避免内存问题）
+                    if i < 10:
+                        self.intermediate_result.emit(i, result_text)
+
+                    # 发出进度信号
+                    self.progress.emit(i + 1, total)
+
+            # 处理完成
+            self.finished.emit(result_text)
+        except Exception as e:
+            self.error.emit(str(e))
 
 
 class TabContent(QWidget):
@@ -168,48 +213,113 @@ class TabContent(QWidget):
         """
         当点击 EXE 按钮时调用
         按顺序执行所有控件（跳过被禁用的控件）
+        使用多线程避免 UI 阻塞
         """
         try:
             # 获取当前文本（原始文本）
             original_text = self.text_editor.get_text()
-            
+
             # 清空文本缓存
             self._text_cache = []
             # 保存原始文本作为第一个缓存
             self._text_cache.append(original_text)
-            
-            # 按顺序执行所有控件（跳过被禁用的）
-            result_text = original_text
-            for control in self.control_panel.get_controls():
-                # 检查控件是否被禁用
-                if hasattr(control, 'is_disabled') and control.is_disabled():
-                    continue  # 跳过被禁用的控件
-                
-                # 检查控件是否有 execute 方法
-                if hasattr(control, 'execute'):
-                    result_text = control.execute(result_text)
-                    # 保存每个控件执行后的文本
-                    self._text_cache.append(result_text)
-            
-            # 更新文本编辑器（显示最终结果）
-            self.text_editor.set_text(result_text)
-            
-            # 更新箭头按钮列表
-            self._update_arrow_buttons()
-            
-            # 选中最新的按钮（最后一个）
-            if self._arrow_buttons:
-                self._select_button(len(self._arrow_buttons) - 1)
-            
-            # 显示成功状态
-            self.set_status("执行完成", is_error=False)
-            
-        except json.JSONDecodeError:
-            self.set_status("JSON格式化出错", is_error=True)
+
+            # 禁用执行按钮，防止重复执行
+            self.control_panel.run_button.setEnabled(False)
+            self.control_panel.run_button.setText("执行中...")
+
+            # 获取所有启用的控件
+            self._enabled_controls = [c for c in self.control_panel.get_controls()
+                                    if not (hasattr(c, 'is_disabled') and c.is_disabled())]
+
+            # 创建工作线程
+            self.process_thread = QThread()
+            self.process_worker = ProcessWorker(self._enabled_controls, original_text)
+            self.process_worker.moveToThread(self.process_thread)
+
+            # 连接信号
+            self.process_thread.started.connect(self.process_worker.run)
+            self.process_worker.finished.connect(self._on_process_finished)
+            self.process_worker.intermediate_result.connect(self._on_intermediate_result)
+            self.process_worker.progress.connect(self._on_process_progress)
+            self.process_worker.error.connect(self._on_process_error)
+            self.process_worker.finished.connect(self.process_thread.quit)
+            self.process_thread.finished.connect(self.process_thread.deleteLater)
+
+            # 启动线程
+            self.process_thread.start()
+            self.set_status("正在处理数据...", is_error=False)
+
         except Exception as e:
-            # 其他错误
             error_msg = str(e)
             self.set_status(f"执行出错: {error_msg}", is_error=True)
+            # 恢复按钮状态
+            self.control_panel.run_button.setEnabled(True)
+            self.control_panel.run_button.setText("执行")
+
+    def _on_intermediate_result(self, index, text):
+        """
+        处理中间结果（用于缓存）
+
+        Args:
+            index: 控件索引
+            text: 中间结果文本
+        """
+        # 仅缓存前10个步骤的结果，避免内存问题
+        if len(self._text_cache) < 10:
+            self._text_cache.append(text)
+
+    def _on_process_progress(self, current, total):
+        """
+        处理进度更新
+
+        Args:
+            current: 当前进度
+            total: 总数量
+        """
+        if total > 0:
+            percent = int((current / total) * 100)
+            self.set_status(f"正在处理... {percent}% ({current}/{total})", is_error=False)
+
+    def _on_process_finished(self, result_text):
+        """
+        处理完成
+
+        Args:
+            result_text: 处理结果文本
+        """
+        # 更新文本编辑器（显示最终结果）
+        self.text_editor.set_text(result_text)
+
+        # 更新箭头按钮列表
+        self._update_arrow_buttons()
+
+        # 选中最新的按钮（最后一个）
+        if self._arrow_buttons:
+            self._select_button(len(self._arrow_buttons) - 1)
+
+        # 显示成功状态
+        self.set_status("执行完成", is_error=False)
+
+        # 恢复按钮状态
+        self.control_panel.run_button.setEnabled(True)
+        self.control_panel.run_button.setText("执行")
+
+    def _on_process_error(self, error_msg):
+        """
+        处理错误
+
+        Args:
+            error_msg: 错误消息
+        """
+        if "JSON" in error_msg:
+            self.set_status("JSON格式化出错", is_error=True)
+        else:
+            self.set_status(f"执行出错: {error_msg}", is_error=True)
+
+        # 恢复按钮状态
+        self.control_panel.run_button.setEnabled(True)
+        self.control_panel.run_button.setText("执行")
     
     def _update_arrow_buttons(self):
         """

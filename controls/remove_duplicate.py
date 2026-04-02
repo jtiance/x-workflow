@@ -116,48 +116,50 @@ class RemoveDuplicateControl(BaseControl):
     def execute(self, text):
         """
         执行移除重复行操作
-        
+
         Args:
             text: 要处理的文本
-            
+
         Returns:
             str: 处理后的文本
         """
         if not text:
             return text
-        
+
         lines = text.split('\n')
-        
+
         ignore_case = self.is_ignore_case()
         ignore_blank = self.is_ignore_blank()
         mode = self.get_mode()
-        
+
         if mode == "first":
-            seen = []
+            # 使用集合而不是列表，提高查找性能 O(1) vs O(n)
+            seen = set()
             result = []
             for line in lines:
                 if ignore_blank and not line.strip():
                     result.append(line)
                     continue
-                
+
                 check_line = line if not ignore_case else line.lower()
-                
+
                 if check_line not in seen:
-                    seen.append(check_line)
+                    seen.add(check_line)
                     result.append(line)
-            
+
             return '\n'.join(result)
-        
+
         else:
+            # 保留最后一次出现 - 使用字典
             seen_last = {}
             for line in lines:
                 if ignore_blank and not line.strip():
                     continue
-                
+
                 check_line = line if not ignore_case else line.lower()
                 seen_last[check_line] = line
-            
-            return '\n'.join(list(seen_last.values()))
+
+            return '\n'.join(seen_last.values())
         
     def reset_parameters(self):
         """
