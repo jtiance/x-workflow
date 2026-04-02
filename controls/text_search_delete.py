@@ -63,14 +63,14 @@ class TextSearchDeleteControl(BaseControl):
         self.case_checkbox.setChecked(False)
         self.case_checkbox.setToolTip("区分大小写")
         self.case_checkbox.clicked.connect(self._emit_parameters_changed)
-        self.case_checkbox.setFixedWidth(40)
+        self.case_checkbox.setFixedWidth(45)
         
         # 使用正则表达式按钮
         self.regex_checkbox = TogglePushButton("RE")
         self.regex_checkbox.setChecked(False)
         self.regex_checkbox.setToolTip("使用正则表达式")
         self.regex_checkbox.clicked.connect(self._emit_parameters_changed)
-        self.regex_checkbox.setFixedWidth(40)
+        self.regex_checkbox.setFixedWidth(45)
         
         # 添加按钮到水平布局
         button_layout.addWidget(self.case_checkbox)

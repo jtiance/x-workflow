@@ -383,7 +383,9 @@ class ControlDialog(QDialog):
             
             # 设置一些示例数据
             preview_control.set_separator(", ")
-            
+            # 默认关闭换行功能
+            preview_control.set_enable_line_break(False)
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()

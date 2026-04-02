@@ -63,18 +63,21 @@ class TextReplaceControl(BaseControl):
         self.case_checkbox.setChecked(False)
         self.case_checkbox.setToolTip("忽略大小写")
         self.case_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.case_checkbox.setFixedWidth(45)
         
         # 使用正则表达式按钮
         self.regex_checkbox = TogglePushButton("RE")
         self.regex_checkbox.setChecked(False)
         self.regex_checkbox.setToolTip("使用正则表达式")
         self.regex_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.regex_checkbox.setFixedWidth(45)
         
         # 查找转义字符按钮
         self.find_escape_checkbox = TogglePushButton("/r/n")
         self.find_escape_checkbox.setChecked(False)
         self.find_escape_checkbox.setToolTip("查找转义字符")
         self.find_escape_checkbox.clicked.connect(self._emit_parameters_changed)
+        self.regex_checkbox.setFixedWidth(60)
         
         # 设置按钮固定宽度
         button_width = 50

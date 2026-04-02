@@ -62,14 +62,14 @@ class RemoveDuplicateControl(BaseControl):
         self.ignore_case_check.setChecked(False)
         self.ignore_case_check.setToolTip("忽略大小写")
         self.ignore_case_check.clicked.connect(self._emit_parameters_changed)
-        self.ignore_case_check.setFixedWidth(40)
+        self.ignore_case_check.setFixedWidth(45)
         
         # 忽略空行按钮
         self.ignore_blank_check = CheckablePushButton("忽略空行")
         self.ignore_blank_check.setChecked(False)
         self.ignore_blank_check.setToolTip("空行不会被移除重复行")
         self.ignore_blank_check.clicked.connect(self._emit_parameters_changed)
-        self.ignore_blank_check.setFixedWidth(60)
+        self.ignore_blank_check.setFixedWidth(80)
         
         # 添加按钮到水平布局
         button_layout.addWidget(self.ignore_case_check)

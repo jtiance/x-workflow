@@ -6,7 +6,7 @@
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QGridLayout, QSizePolicy)
-from qfluentwidgets import ComboBox, BodyLabel, LineEdit
+from qfluentwidgets import ComboBox, BodyLabel, LineEdit, SpinBox, SwitchButton
 
 from components.custom_buttons import CheckablePushButton
 from controls.base_control import BaseControl
@@ -14,9 +14,9 @@ from controls.base_control import BaseControl
 SEPARATOR_MAP = {
     "无": "",
     "空格": " ",
-    "逗号": ",",
-    "分号": ";",
-    "竖线": "|",
+    "逗号 ( , )": ",",
+    "分号 ( ; )": ";",
+    "竖线 ( | )": "|",
     "自定义": None
 }
 
@@ -30,7 +30,7 @@ class TextMergeControl(BaseControl):
     def __init__(self, parent=None):
         """
         初始化文本合并控件
-        
+
         Args:
             parent: 父控件
         """
@@ -101,6 +101,37 @@ class TextMergeControl(BaseControl):
         # 将水平布局添加到网格布局
         grid_layout.addLayout(button_layout, 2, 1)  # 放在第二列
 
+        # 第4行：支持换行开关
+        enable_line_break_label = BodyLabel("按字符数量换行:")
+        enable_line_break_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        self.enable_line_break_switch = SwitchButton()
+        self.enable_line_break_switch.setChecked(False)  # 默认关闭
+        self.enable_line_break_switch.checkedChanged.connect(self._on_line_break_changed)
+        self.enable_line_break_switch.setOffText("关闭")
+        self.enable_line_break_switch.setOnText("开启")
+
+        grid_layout.addWidget(enable_line_break_label, 3, 0)
+        grid_layout.addWidget(self.enable_line_break_switch, 3, 1, 1, 1, Qt.AlignLeft)  # 左对齐
+
+        # 第5行：最大字符数
+        max_chars_label = BodyLabel("最大字符数:")
+        max_chars_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        self.max_chars_spin = SpinBox()
+        # 先设置范围，再设置值
+        self.max_chars_spin.setMinimum(0)  # 0表示不限制
+        self.max_chars_spin.setMaximum(1000000)  # 最大100万
+        self.max_chars_spin.setSingleStep(10000)  # 步宽10000
+        self.max_chars_spin.setValue(10000)  # 默认值
+        self.max_chars_spin.setSuffix("字符")  # 后缀
+        self.max_chars_spin.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.max_chars_spin.valueChanged.connect(self._emit_parameters_changed)
+        self.max_chars_spin.setEnabled(False)  # 默认禁用（因为开关默认关闭）
+
+        grid_layout.addWidget(max_chars_label, 4, 0)
+        grid_layout.addWidget(self.max_chars_spin, 4, 1)  # 左对齐
+
         # 设置列拉伸，让第二列占据所有剩余空间
         grid_layout.setColumnStretch(1, 1)
 
@@ -116,10 +147,22 @@ class TextMergeControl(BaseControl):
         else:
             self.custom_separator_input.setVisible(False)
 
+    def _on_line_break_changed(self, checked):
+        """
+        当换行开关改变时调用
+
+        Args:
+            checked: 是否开启
+        """
+        # 启用或禁用最大字符数输入框
+        self.max_chars_spin.setEnabled(checked)
+        # 发出参数改变信号
+        self._emit_parameters_changed()
+
     def get_separator(self):
         """
         获取当前连接符
-        
+
         Returns:
             str: 连接符
         """
@@ -133,7 +176,7 @@ class TextMergeControl(BaseControl):
     def set_separator(self, separator):
         """
         设置连接符
-        
+
         Args:
             separator: 连接符
         """
@@ -149,13 +192,69 @@ class TextMergeControl(BaseControl):
             self.custom_separator_input.setText(separator)
             self.custom_separator_input.setVisible(True)
 
+    def get_max_chars(self):
+        """
+        获取最大字符数
+
+        Returns:
+            int: 最大字符数，0表示不限制
+        """
+        return self.max_chars_spin.value()
+
+    def set_max_chars(self, value):
+        """
+        设置最大字符数
+
+        Args:
+            value: 最大字符数
+        """
+        self.max_chars_spin.setValue(value)
+
+    def is_enable_line_break(self):
+        """
+        获取是否启用换行功能
+
+        Returns:
+            bool: 是否启用换行
+        """
+        return self.enable_line_break_switch.isChecked()
+
+    def set_enable_line_break(self, enabled):
+        """
+        设置是否启用换行功能
+
+        Args:
+            enabled: 是否启用换行
+        """
+        self.enable_line_break_switch.setChecked(enabled)
+        # 同时启用或禁用 SpinBox
+        self.max_chars_spin.setEnabled(enabled)
+
+    def set_disabled_state(self, disabled):
+        """
+        重写父类方法，处理 max_chars_spin 的特殊情况
+
+        Args:
+            disabled: 是否禁用
+        """
+        # 调用父类方法处理通用的禁用逻辑
+        super().set_disabled_state(disabled)
+
+        # 对于 max_chars_spin，需要同时考虑控件禁用状态和换行开关状态
+        # 如果控件被禁用，则禁用 SpinBox
+        # 如果控件被启用，则根据换行开关状态决定
+        if disabled:
+            self.max_chars_spin.setEnabled(False)
+        else:
+            self.max_chars_spin.setEnabled(self.enable_line_break_switch.isChecked())
+
     def execute(self, text):
         """
         执行文本合并操作（按行分割后再合并）
-        
+
         Args:
             text: 要处理的文本
-            
+
         Returns:
             str: 处理后的文本
         """
@@ -175,7 +274,35 @@ class TextMergeControl(BaseControl):
             return ""
 
         separator = self.get_separator()
-        return separator.join(processed)
+        max_chars = self.get_max_chars()
+        enable_line_break = self.is_enable_line_break()
+
+        # 如果启用了换行功能且设置了最大字符数限制
+        if enable_line_break and max_chars > 0:
+            result_lines = []
+            current_line = ""
+
+            for line in processed:
+                # 如果是第一行，直接添加
+                if not current_line:
+                    current_line = line
+                else:
+                    # 检查添加后是否超过限制
+                    if len(current_line) + len(separator) + len(line) <= max_chars:
+                        current_line += separator + line
+                    else:
+                        # 超过限制，保存当前行，开始新行
+                        result_lines.append(current_line)
+                        current_line = line
+
+            # 添加最后一行
+            if current_line:
+                result_lines.append(current_line)
+
+            return "\n".join(result_lines)
+        else:
+            # 没有限制或未启用换行，直接合并
+            return separator.join(processed)
 
     def reset_parameters(self):
         """
@@ -186,11 +313,14 @@ class TextMergeControl(BaseControl):
         self.custom_separator_input.setVisible(False)
         self.trim_checkbox.setChecked(False)
         self.filter_checkbox.setChecked(True)
+        self.enable_line_break_switch.setChecked(False)  # 默认关闭
+        self.max_chars_spin.setValue(10000)
+        self.max_chars_spin.setEnabled(False)  # 因为开关默认关闭，所以禁用 SpinBox
 
     def get_config(self):
         """
         获取控件配置
-        
+
         Returns:
             dict: 控件配置字典
         """
@@ -198,13 +328,15 @@ class TextMergeControl(BaseControl):
             "type": "text_merge",
             "separator": self.get_separator(),
             "trim_whitespace": self.trim_checkbox.isChecked(),
-            "filter_empty": self.filter_checkbox.isChecked()
+            "filter_empty": self.filter_checkbox.isChecked(),
+            "enable_line_break": self.is_enable_line_break(),
+            "max_chars": self.get_max_chars()
         }
 
     def load_config(self, config):
         """
         加载控件配置
-        
+
         Args:
             config: 控件配置字典
         """
@@ -212,11 +344,13 @@ class TextMergeControl(BaseControl):
             self.set_separator(config.get("separator", "\n"))
             self.trim_checkbox.setChecked(config.get("trim_whitespace", False))
             self.filter_checkbox.setChecked(config.get("filter_empty", True))
+            self.set_enable_line_break(config.get("enable_line_break", False))
+            self.set_max_chars(config.get("max_chars", 10000))
 
     def get_control_type(self):
         """
         获取控件类型
-        
+
         Returns:
             str: 控件类型标识
         """
