@@ -243,7 +243,6 @@ class MainWindow(QMainWindow):
         Args:
             workflow_name: 流程名称，如果提供则加载该流程
         """
-        print("added")
         # 创建标签页内容
         tab_content = TabContent()
         

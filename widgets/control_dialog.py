@@ -5,11 +5,11 @@
 """
 
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QListWidget, 
-    QListWidgetItem, QLabel, QFrame, QSplitter, QWidget
+    QDialog, QVBoxLayout, QHBoxLayout, QGridLayout,
+    QLabel, QFrame, QSplitter, QWidget
 )
 from PySide6.QtCore import Qt, Signal
-from qfluentwidgets import PushButton
+from qfluentwidgets import PushButton, ListWidget
 
 
 class ControlDialog(QDialog):
@@ -55,81 +55,93 @@ class ControlDialog(QDialog):
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(10)
-        
-        # 创建分割器，左右分隔
-        splitter = QSplitter(Qt.Horizontal)
-        
+
+        # 创建网格布局 (2行2列)
+        grid_layout = QGridLayout()
+        grid_layout.setSpacing(10)
+
         # ============= 左侧：控件列表 =============
-        left_widget = QWidget()
-        left_layout = QVBoxLayout(left_widget)
-        left_layout.setContentsMargins(0, 0, 0, 0)
-        
         # 列表标题
         left_title = QLabel("可用控件")
         left_title.setObjectName("ListTitle")
-        
+
         # 控件列表
-        self.control_list = QListWidget()
+        self.control_list = ListWidget()
         self.control_list.setObjectName("ControlList")
+        self.control_list.setMinimumWidth(200)  # 设置最小宽度
+        self.control_list.setMinimumHeight(300)  # 设置最小高度
+        # 通过边框体现列表范围（保留原有样式）
+        self.control_list.setStyleSheet("""
+            ListWidget {
+                border: 1px solid #4a4a4a;
+                border-radius: 4px;
+            }
+            ListWidget::item {
+                min-height: 30px;
+            }
+        """)
         self.control_list.currentItemChanged.connect(self._on_selection_changed)
         self.control_list.itemDoubleClicked.connect(self._on_item_double_clicked)
-        
-        # 添加到左侧布局
-        left_layout.addWidget(left_title)
-        left_layout.addWidget(self.control_list)
-        
+
         # ============= 右侧：预览区域 =============
-        right_widget = QWidget()
-        right_layout = QVBoxLayout(right_widget)
-        right_layout.setContentsMargins(0, 0, 0, 0)
-        
         # 预览标题
         right_title = QLabel("控件预览")
         right_title.setObjectName("PreviewTitle")
-        
+
         # 预览区域（使用 QFrame 作为容器）
         self.preview_area = QFrame()
         self.preview_area.setFrameShape(QFrame.StyledPanel)
         self.preview_area.setObjectName("PreviewArea")
-        
+        self.preview_area.setMinimumHeight(300)  # 设置最小高度
+        # 设置边框样式，只针对这个 QFrame
+        self.preview_area.setStyleSheet("""
+            QFrame#PreviewArea {
+                border: 1px solid #4a4a4a;
+                border-radius: 4px;
+            }
+        """)
+
         # 预览区域的布局
         self.preview_layout = QVBoxLayout(self.preview_area)
         self.preview_layout.setContentsMargins(10, 10, 10, 10)
-        
+
         # 初始提示标签
         self.preview_hint = QLabel("请从左侧选择一个控件")
         self.preview_hint.setAlignment(Qt.AlignCenter)
         self.preview_layout.addWidget(self.preview_hint)
-        
-        # 添加到右侧布局
-        right_layout.addWidget(right_title)
-        right_layout.addWidget(self.preview_area)
-        
-        # 将左右两侧添加到分割器
-        splitter.addWidget(left_widget)
-        splitter.addWidget(right_widget)
-        splitter.setStretchFactor(0, 1)  # 左侧占1份
-        splitter.setStretchFactor(1, 2)  # 右侧占2份
-        
+
+        # ============= 添加到网格布局 =============
+        # 第一行：标题
+        grid_layout.addWidget(left_title, 0, 0)
+        grid_layout.addWidget(right_title, 0, 1)
+
+        # 第二行：内容
+        grid_layout.addWidget(self.control_list, 1, 0)
+        grid_layout.addWidget(self.preview_area, 1, 1)
+
+        # 设置列宽比例 (左侧1，右侧4)
+        grid_layout.setColumnStretch(0, 1)
+        grid_layout.setColumnStretch(1, 4)
+
         # ============= 底部：按钮区域 =============
         button_layout = QHBoxLayout()
         button_layout.addStretch()  # 添加弹性空间
-        
+
         # 确定按钮
         self.ok_button = PushButton("确定")
         self.ok_button.clicked.connect(self._on_ok_clicked)
         self.ok_button.setEnabled(False)  # 初始禁用，直到选择控件
-        
+
         # 取消按钮
         self.cancel_button = PushButton("取消")
         self.cancel_button.clicked.connect(self.reject)
-        
+
         # 添加按钮
         button_layout.addWidget(self.ok_button)
         button_layout.addWidget(self.cancel_button)
-        
+
         # 将所有部分添加到主布局
-        main_layout.addWidget(splitter)
+        main_layout.addLayout(grid_layout)
         main_layout.addLayout(button_layout)
         
     def _populate_control_list(self):
@@ -157,9 +169,11 @@ class ControlDialog(QDialog):
         
         # 添加到列表
         for display_name, control_type in controls:
-            item = QListWidgetItem(display_name)
-            item.setData(Qt.UserRole, control_type)  # 保存控件类型到 item 的数据中
-            self.control_list.addItem(item)
+            # 直接使用字符串添加项
+            self.control_list.addItem(display_name)
+            # 获取最后一项并设置数据
+            last_item = self.control_list.item(self.control_list.count() - 1)
+            last_item.setData(Qt.UserRole, control_type)
             
     def _on_selection_changed(self, current, previous):
         """
@@ -205,10 +219,13 @@ class ControlDialog(QDialog):
     def _update_preview(self, control_type):
         """
         更新预览区域，显示选中控件的预览
-        
+
         Args:
             control_type: 控件类型标识
         """
+        # 先添加一个 stretch，让控件能够在垂直方向居中
+        self.preview_layout.addStretch()
+
         if control_type == "text_replace":
             # 文本替换控件预览
             from controls.text_replace import TextReplaceControl

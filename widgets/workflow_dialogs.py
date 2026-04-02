@@ -5,11 +5,11 @@
 """
 
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
-    QLineEdit, QListWidget, QMessageBox
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel,
+    QLineEdit, QMessageBox
 )
 from PySide6.QtCore import Signal
-from qfluentwidgets import PushButton
+from qfluentwidgets import PushButton, ListWidget
 
 
 class SaveWorkflowDialog(QDialog):
@@ -265,8 +265,18 @@ class WorkflowManagerDialog(QDialog):
         label = QLabel("流程列表:")
         
         # 流程列表
-        self.workflow_list = QListWidget()
+        self.workflow_list = ListWidget()
         self.workflow_list.itemDoubleClicked.connect(self._on_item_double_clicked)
+        # 使用 !important 强制覆盖背景色
+        self.workflow_list.setStyleSheet("""
+            ListWidget {
+                border: 1px solid #4a4a4a;
+                border-radius: 4px;
+            }
+            ListWidget::item {
+                min-height: 30px;
+            }
+        """)
         
         # 填充列表
         for name in self.workflow_names:
