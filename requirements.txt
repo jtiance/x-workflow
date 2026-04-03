@@ -2,3 +2,4 @@ pyside6>=6.10.2
 PySide6-Fluent-Widgets>=1.8.0
 pygments>=2.18.0,<3.0.0
 polars>=1.0.0
+fastexcel>=0.11.0

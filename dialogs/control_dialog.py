@@ -160,6 +160,7 @@ class ControlDialog(CustomDialog):
             ("移除重复行", "remove_duplicate"),
             ("移除空行", "remove_empty_lines"),
             ("文本裁剪", "text_trim"),
+            ("读取Excel列", "read_excel_column"),
         ]
 
         # 添加到列表
@@ -446,6 +447,21 @@ class ControlDialog(CustomDialog):
 
             # 设置一些示例数据
             preview_control.match_edit.setText("test")
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
+        elif control_type == "read_excel_column":
+            # 读取Excel列控件预览
+            from controls.read_excel_column import ReadExcelColumn
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = ReadExcelColumn()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
 
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)

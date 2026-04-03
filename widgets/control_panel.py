@@ -175,7 +175,6 @@ class ControlPanel(QWidget):
         self.round_menu = RoundMenu(parent=self)
         self.round_menu.addActions([
             Action(FluentIcon.IMAGE_EXPORT, "导出", triggered=lambda checked: self.export_requested.emit()),
-            Action(FluentIcon.IMAGE_EXPORT, "测试自定义对话框", triggered=lambda checked: self._show_test_dialog())
         ])
 
     def set_save_button_text(self, text):

@@ -13,5 +13,6 @@ from .text_search_delete import TextSearchDeleteControl
 from .remove_duplicate import RemoveDuplicateControl
 from .remove_empty_lines import RemoveEmptyLinesControl
 from .text_trim import TextTrimControl
+from .read_excel_column import ReadExcelColumn
 
-__all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl', 'RemoveDuplicateControl', 'RemoveEmptyLinesControl', 'TextTrimControl']
+__all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl', 'RemoveDuplicateControl', 'RemoveEmptyLinesControl', 'TextTrimControl', 'ReadExcelColumn']

@@ -469,6 +469,11 @@ class MainWindow(QMainWindow):
             control = HtmlFormatControl()
             tab_content.add_control(control)
 
+        elif control_type == "read_excel_column":
+            from controls.read_excel_column import ReadExcelColumn
+            control = ReadExcelColumn()
+            tab_content.add_control(control)
+
     def _show_about(self):
         """
         显示关于对话框
