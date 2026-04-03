@@ -5,57 +5,57 @@
 """
 
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QFrame, QSplitter, QWidget
+    QGridLayout, QLabel, QFrame, QWidget, QVBoxLayout
 )
 from PySide6.QtCore import Qt, Signal
-from qfluentwidgets import PushButton, ListWidget
+from qfluentwidgets import ListWidget
+
+from .custom_dialog import CustomDialog
 
 
-class ControlDialog(QDialog):
+class ControlDialog(CustomDialog):
     """
     控件选择对话框
     左侧显示可用控件列表，右侧显示选中控件的预览
     """
-    
+
     # 定义信号：当用户确认选择控件时发出
     control_selected = Signal(str)  # 控件类型名称
-    
+
     def __init__(self, parent=None):
         """
         初始化控件选择对话框
-        
+
         Args:
             parent: 父控件
         """
-        super().__init__(parent)
-        
+        super().__init__(title="控件选择器", parent=parent)
+
         # 设置对话框属性
-        self.setWindowTitle("控件选择器")
         self.setMinimumSize(600, 400)  # 设置最小尺寸
         self.setObjectName("ControlDialog")
-        
+
         # 保存选中的控件类型
         self.selected_control = None
-        
+
+        # 调整内容区域边距
+        self.set_content_margins(10, 10, 10, 10)
+        self.set_content_spacing(10)
+
         # 初始化 UI
         self._init_ui()
-        
+
         # 填充控件列表
         self._populate_control_list()
-        
-        # 清除默认选择（不选中任何项）
-        self.control_list.clearSelection()
-        
+
+        # 默认选中第一个选项
+        if self.control_list.count() > 0:
+            self.control_list.setCurrentRow(0)
+
     def _init_ui(self):
         """
         初始化用户界面
         """
-        # 创建主布局
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(10)
-
         # 创建网格布局 (2行2列)
         grid_layout = QGridLayout()
         grid_layout.setSpacing(10)
@@ -78,6 +78,10 @@ class ControlDialog(QDialog):
             }
             ListWidget::item {
                 min-height: 30px;
+            }
+            ListWidget::item:selected {
+                background-color: #0078d4;
+                color: white;
             }
         """)
         self.control_list.currentItemChanged.connect(self._on_selection_changed)
@@ -123,27 +127,18 @@ class ControlDialog(QDialog):
         grid_layout.setColumnStretch(0, 1)
         grid_layout.setColumnStretch(1, 4)
 
-        # ============= 底部：按钮区域 =============
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()  # 添加弹性空间
+        # 将网格布局容器添加到内容区域
+        grid_widget = QWidget()
+        grid_widget.setLayout(grid_layout)
+        self.add_content_widget(grid_widget)
 
-        # 确定按钮
-        self.ok_button = PushButton("确定")
-        self.ok_button.clicked.connect(self._on_ok_clicked)
+        # ============= 底部按钮区域 =============
+        # 取消按钮
+        self.add_button("取消", is_reject=True)
+        # 确定按钮（主按钮蓝色）
+        self.ok_button = self.add_button("确定", callback=self._on_ok_clicked, is_primary=True, is_accept=True)
         self.ok_button.setEnabled(False)  # 初始禁用，直到选择控件
 
-        # 取消按钮
-        self.cancel_button = PushButton("取消")
-        self.cancel_button.clicked.connect(self.reject)
-
-        # 添加按钮
-        button_layout.addWidget(self.ok_button)
-        button_layout.addWidget(self.cancel_button)
-
-        # 将所有部分添加到主布局
-        main_layout.addLayout(grid_layout)
-        main_layout.addLayout(button_layout)
-        
     def _populate_control_list(self):
         """
         填充控件列表
@@ -166,7 +161,7 @@ class ControlDialog(QDialog):
             ("移除空行", "remove_empty_lines"),
             ("文本裁剪", "text_trim"),
         ]
-        
+
         # 添加到列表
         for display_name, control_type in controls:
             # 直接使用字符串添加项
@@ -174,38 +169,38 @@ class ControlDialog(QDialog):
             # 获取最后一项并设置数据
             last_item = self.control_list.item(self.control_list.count() - 1)
             last_item.setData(Qt.UserRole, control_type)
-            
+
     def _on_selection_changed(self, current, previous):
         """
         当列表选择改变时调用
-        
+
         Args:
             current: 当前选中的 item
             previous: 之前选中的 item
         """
         # 清空预览区域
         self._clear_preview()
-        
+
         if current is not None:
             # 获取选中的控件类型
             control_type = current.data(Qt.UserRole)
             self.selected_control = control_type
-            
+
             # 启用确定按钮
             self.ok_button.setEnabled(True)
-            
+
             # 更新预览
             self._update_preview(control_type)
         else:
             # 没有选中任何项
             self.selected_control = None
             self.ok_button.setEnabled(False)
-            
+
             # 显示提示
             self.preview_hint = QLabel("请从左侧选择一个控件")
             self.preview_hint.setAlignment(Qt.AlignCenter)
             self.preview_layout.addWidget(self.preview_hint)
-            
+
     def _clear_preview(self):
         """
         清空预览区域
@@ -215,7 +210,7 @@ class ControlDialog(QDialog):
             item = self.preview_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-                
+
     def _update_preview(self, control_type):
         """
         更新预览区域，显示选中控件的预览
@@ -229,55 +224,55 @@ class ControlDialog(QDialog):
         if control_type == "text_replace":
             # 文本替换控件预览
             from controls.text_replace import TextReplaceControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = TextReplaceControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.set_find_text("hello")
             preview_control.set_replace_text("world")
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "json_format":
             # JSON格式化控件预览
             from controls.json_format import JsonFormatControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = JsonFormatControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.set_indent(4)
             preview_control.set_sort_keys(True)
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "json_compress":
             # JSON压缩控件预览
             from controls.json_compress import JsonCompressControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = JsonCompressControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.set_sort_keys(True)
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
@@ -321,66 +316,66 @@ class ControlDialog(QDialog):
         elif control_type == "add_text":
             # 增加文本控件预览
             from controls.add_text import AddTextControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = AddTextControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.set_operation_type("增加前缀")
             preview_control.set_text("> ")
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "case_convert":
             # 大小写转换控件预览
             from controls.case_convert import CaseConvertControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = CaseConvertControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "text_split":
             # 文本分割控件预览
             from controls.text_split import TextSplitControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = TextSplitControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.set_delimiter(",")
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "text_merge":
             # 文本合并控件预览
             from controls.text_merge import TextMergeControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = TextMergeControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.set_separator(", ")
             # 默认关闭换行功能
@@ -389,73 +384,73 @@ class ControlDialog(QDialog):
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "text_search_delete":
             # 文本搜索删除控件预览
             from controls.text_search_delete import TextSearchDeleteControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = TextSearchDeleteControl()
             preview_control.setEnabled(False)  # 禁用交互
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.set_search_text("test")
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "remove_duplicate":
             # 移除重复行控件预览
             from controls.remove_duplicate import RemoveDuplicateControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = RemoveDuplicateControl()
             preview_control.setEnabled(False)
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "remove_empty_lines":
             # 移除空行控件预览
             from controls.remove_empty_lines import RemoveEmptyLinesControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = RemoveEmptyLinesControl()
             preview_control.setEnabled(False)
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
         elif control_type == "text_trim":
             # 文本裁剪控件预览
             from controls.text_trim import TextTrimControl
-            
+
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = TextTrimControl()
             preview_control.setEnabled(False)
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
-            
+
             # 设置一些示例数据
             preview_control.match_edit.setText("test")
-            
+
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
-            
+
     def _on_ok_clicked(self):
         """
         当点击确定按钮时调用
@@ -463,9 +458,7 @@ class ControlDialog(QDialog):
         if self.selected_control:
             # 发出信号
             self.control_selected.emit(self.selected_control)
-            # 关闭对话框，返回 Accepted
-            self.accept()
-            
+
     def _on_item_double_clicked(self, item):
         """
         当双击列表项时调用
@@ -477,11 +470,11 @@ class ControlDialog(QDialog):
             self.control_selected.emit(self.selected_control)
             # 关闭对话框，返回 Accepted
             self.accept()
-            
+
     def get_selected_control(self):
         """
         获取选中的控件类型
-        
+
         Returns:
             str: 控件类型标识，如果没有选中则返回 None
         """

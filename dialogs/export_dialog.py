@@ -6,14 +6,15 @@
 
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel
+    QGridLayout, QLabel, QWidget
 )
-from qfluentwidgets import PushButton, PrimaryPushButton, ComboBox
+from qfluentwidgets import ComboBox
 
 from components.custom_folder import CustomFolder
+from .custom_dialog import CustomDialog
 
 
-class ExportDialog(QDialog):
+class ExportDialog(CustomDialog):
     """
     导出对话框
     """
@@ -28,26 +29,15 @@ class ExportDialog(QDialog):
         Args:
             parent: 父控件
         """
-        super().__init__(parent)
+        super().__init__(title="导出文档", parent=parent)
 
         # 设置对话框属性
-        self.setWindowTitle("导出文档")
         self.setMinimumSize(450, 180)
 
-        # 初始化 UI
-        self._init_ui()
-
-    def _init_ui(self):
-        """
-        初始化用户界面
-        """
-        # 创建主布局
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setSpacing(15)
-
         # ============= GridLayout 表单区域 =============
-        grid_layout = QGridLayout()
+        form_widget = QWidget()
+        grid_layout = QGridLayout(form_widget)
+        grid_layout.setContentsMargins(0, 0, 0, 0)
         grid_layout.setSpacing(10)
 
         # 第一行：导出路径
@@ -69,25 +59,15 @@ class ExportDialog(QDialog):
         # 设置列伸展因子，让输入框占更多空间
         grid_layout.setColumnStretch(1, 1)
 
+        # 将表单添加到内容区域
+        self.add_content_widget(form_widget)
+
         # ============= 底部按钮区域 =============
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-
-        # 导出按钮（在左侧）
-        self.export_button = PrimaryPushButton("导出")
-        self.export_button.clicked.connect(self._on_export_clicked)
+        # 取消按钮
+        self.add_button("取消", is_reject=True)
+        # 导出按钮（主按钮）
+        self.export_button = self.add_button("导出", callback=self._on_export_clicked, is_primary=True, is_accept=True)
         self.export_button.setEnabled(False)  # 初始禁用，直到选择路径
-        button_layout.addWidget(self.export_button)
-
-        # 取消按钮（在右侧）
-        self.cancel_button = PushButton("取消")
-        self.cancel_button.clicked.connect(self.reject)
-        button_layout.addWidget(self.cancel_button)
-
-        # 将所有组件添加到主布局
-        main_layout.addLayout(grid_layout)
-        main_layout.addStretch()
-        main_layout.addLayout(button_layout)
 
         # 连接信号
         self.path_input.textChanged.connect(self._on_path_changed)
@@ -110,6 +90,5 @@ class ExportDialog(QDialog):
         # 获取格式（去掉 *.）
         fmt = self.format_combo.currentText().replace("*.", "")
 
-        # 发出信号并关闭
+        # 发出信号
         self.export_confirmed.emit(folder_path, fmt)
-        self.accept()

@@ -5,12 +5,13 @@
 """
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QScrollArea, QFrame, QHBoxLayout, QMenu, QToolButton
+    QWidget, QVBoxLayout, QScrollArea, QFrame, QHBoxLayout, QMenu, QToolButton, QLabel, QLineEdit
 )
 from PySide6.QtCore import Qt, Signal, QPoint
 from qfluentwidgets import PushButton, ToolButton, FluentIcon, Flyout, FlyoutAnimationType, FlyoutViewBase, \
     PrimaryPushButton, BodyLabel, InfoBarIcon, FlyoutView, RoundMenu, Action
 from PySide6.QtWidgets import QMessageBox
+from dialogs import CustomDialog
 
 
 class ControlPanel(QWidget):
@@ -173,7 +174,8 @@ class ControlPanel(QWidget):
         # 1. 创建菜单
         self.round_menu = RoundMenu(parent=self)
         self.round_menu.addActions([
-            Action(FluentIcon.IMAGE_EXPORT, "导出", triggered=lambda checked: self.export_requested.emit())
+            Action(FluentIcon.IMAGE_EXPORT, "导出", triggered=lambda checked: self.export_requested.emit()),
+            Action(FluentIcon.IMAGE_EXPORT, "测试自定义对话框", triggered=lambda checked: self._show_test_dialog())
         ])
 
     def set_save_button_text(self, text):
@@ -450,4 +452,29 @@ class ControlPanel(QWidget):
             self.run_options_button.rect().topRight()
         )
         self.round_menu.exec(pos)
+
+    def _show_test_dialog(self):
+        """
+        显示测试自定义对话框
+        """
+        dialog = CustomDialog(title="自定义对话框测试", parent=self)
+        dialog.setMinimumSize(450, 220)
+
+        # 添加测试内容
+        dialog.add_content_widget(QLabel("✨ 自定义对话框功能特性:"))
+        dialog.add_content_widget(QLabel("✅ 内容区域可自由添加组件"))
+        dialog.add_content_widget(QLabel("✅ 底部按钮自动平均分配宽度"))
+        dialog.add_content_widget(QLabel("✅ 整体圆角 + 底部按钮圆角效果"))
+        dialog.add_content_widget(QLineEdit("这是输入框测试"))
+
+        # 添加3个按钮测试平均分配
+        dialog.add_button("取消", is_reject=True)
+        dialog.add_button("选项1", callback=lambda: print("点击了选项1"))
+        dialog.add_button("确定", is_accept=True, is_primary=True)
+
+        # 显示对话框
+        if dialog.exec() == CustomDialog.Accepted:
+            print("用户确认操作")
+        else:
+            print("用户取消操作")
 
