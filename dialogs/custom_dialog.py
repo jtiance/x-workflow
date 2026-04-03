@@ -94,7 +94,7 @@ class CustomDialog(QDialog):
 
             /* 按钮通用样式 */
             PushButton, PrimaryPushButton {
-                height: 42px;
+                height: 32px;
                 border: none;
                 border-radius: 0;
                 font-size: 14px;

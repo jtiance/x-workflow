@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QLabel, QLineEdit, QWidget, QVBoxLayout
 )
 from PySide6.QtCore import Signal
-from qfluentwidgets import PushButton, ListWidget
+from qfluentwidgets import PushButton, ListWidget, LineEdit
 
 from .custom_dialog import CustomDialog
 
@@ -57,11 +57,11 @@ class SaveWorkflowDialog(CustomDialog):
             self.save_as_button = self.add_button("另存为", callback=self._on_save_as_clicked)
         else:
             # 保存模式：显示输入框
-            label = QLabel("请输入流程名称:")
+            label = QLabel("流程名称:")
             self.add_content_widget(label)
 
             # 名称输入框
-            self.name_input = QLineEdit()
+            self.name_input = LineEdit()
             self.name_input.setPlaceholderText("输入流程名称...")
             self.name_input.textChanged.connect(self._on_text_changed)
             self.add_content_widget(self.name_input)
@@ -337,7 +337,7 @@ class WorkflowManagerDialog(CustomDialog):
         dialog.add_content_widget(label)
 
         # 输入框
-        name_input = QLineEdit()
+        name_input = LineEdit()
         name_input.setText(old_name)
         name_input.setPlaceholderText("输入新的流程名称...")
         dialog.add_content_widget(name_input)
