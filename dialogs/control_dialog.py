@@ -169,6 +169,7 @@ class ControlDialog(CustomDialog):
             ("Excel转JSON", "excel_to_json"),
             ("日期时间转换", "datetime_convert"),
             ("随机时间生成", "random_datetime"),
+            ("随机数字生成", "random_number"),
         ]
 
         # 定义控件分类映射
@@ -184,11 +185,14 @@ class ControlDialog(CustomDialog):
             "格式化类": [
                 "json_format", "json_compress", "xml_format", "html_format"
             ],
+            "数字类": [
+                "random_number"
+            ],
             "日期类": [
                 "datetime_convert", "random_datetime"
             ],
             "随机类": [
-                "random_datetime"
+                "random_number", "random_datetime"
             ],
             "Excel类": [
                 "read_excel_column", "excel_to_json"
@@ -551,6 +555,20 @@ class ControlDialog(CustomDialog):
 
             # 创建预览控件（禁用交互，只用于显示）
             preview_control = ExcelToJsonControl()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+        elif control_type == "random_number":
+            # 随机数字生成控件预览
+            from controls.random_number import RandomNumberControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = RandomNumberControl()
             preview_control.setEnabled(False)
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):

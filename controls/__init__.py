@@ -17,6 +17,7 @@ from .read_excel_column import ReadExcelColumnControl
 from .datetime_convert import DatetimeConvertControl
 from .random_datetime import RandomDatetimeControl
 from .excel_to_json import ExcelToJsonControl
+from .random_number import RandomNumberControl
 
 __all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl', 'RemoveDuplicateControl', 'RemoveEmptyLinesControl', 'TextTrimControl',
-           'ReadExcelColumnControl', 'DatetimeConvertControl', 'RandomDatetimeControl', 'ExcelToJsonControl']
+           'ReadExcelColumnControl', 'DatetimeConvertControl', 'RandomDatetimeControl', 'ExcelToJsonControl', 'RandomNumberControl']

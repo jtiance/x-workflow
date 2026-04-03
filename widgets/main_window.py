@@ -485,6 +485,10 @@ class MainWindow(QMainWindow):
             from controls.excel_to_json import ExcelToJsonControl
             control = ExcelToJsonControl()
             tab_content.add_control(control)
+        elif control_type == "random_number":
+            from controls.random_number import RandomNumberControl
+            control = RandomNumberControl()
+            tab_content.add_control(control)
 
     def _show_about(self):
         """
