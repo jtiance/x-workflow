@@ -5,10 +5,10 @@
 """
 
 from PySide6.QtWidgets import (
-    QGridLayout, QLabel, QFrame, QWidget, QVBoxLayout
+    QGridLayout, QLabel, QFrame, QWidget, QVBoxLayout, QTreeWidgetItem
 )
 from PySide6.QtCore import Qt, Signal
-from qfluentwidgets import ListWidget
+from qfluentwidgets import ListWidget, TreeWidget
 
 from .custom_dialog import CustomDialog
 
@@ -48,9 +48,13 @@ class ControlDialog(CustomDialog):
         # 填充控件列表
         self._populate_control_list()
 
-        # 默认选中第一个选项
-        if self.control_list.count() > 0:
-            self.control_list.setCurrentRow(0)
+        # 默认选中第一个可选中的子节点
+        root = self.control_list.invisibleRootItem()
+        if root.childCount() > 0:
+            first_category = root.child(0)
+            if first_category.childCount() > 0:
+                first_item = first_category.child(0)
+                self.control_list.setCurrentItem(first_item)
 
     def _init_ui(self):
         """
@@ -65,21 +69,22 @@ class ControlDialog(CustomDialog):
         left_title = QLabel("可用控件")
         left_title.setObjectName("ListTitle")
 
-        # 控件列表
-        self.control_list = ListWidget()
+        # 控件列表（替换为树形结构）
+        self.control_list = TreeWidget()
         self.control_list.setObjectName("ControlList")
         self.control_list.setMinimumWidth(200)  # 设置最小宽度
         self.control_list.setMinimumHeight(300)  # 设置最小高度
+        self.control_list.setHeaderHidden(True)  # 隐藏表头
         # 通过边框体现列表范围（保留原有样式）
         self.control_list.setStyleSheet("""
-            ListWidget {
+            TreeWidget {
                 border: 1px solid #4a4a4a;
                 border-radius: 4px;
             }
-            ListWidget::item {
+            TreeWidget::item {
                 min-height: 30px;
             }
-            ListWidget::item:selected {
+            TreeWidget::item:selected {
                 background-color: #0078d4;
                 color: white;
             }
@@ -141,7 +146,7 @@ class ControlDialog(CustomDialog):
 
     def _populate_control_list(self):
         """
-        填充控件列表
+        填充控件列表（树形结构，按分类分组）
         添加可用的控件类型
         """
         # 这里定义可用的控件类型
@@ -161,17 +166,55 @@ class ControlDialog(CustomDialog):
             ("移除空行", "remove_empty_lines"),
             ("文本裁剪", "text_trim"),
             ("读取Excel列", "read_excel_column"),
+            ("Excel转JSON", "excel_to_json"),
             ("日期时间转换", "datetime_convert"),
             ("随机时间生成", "random_datetime"),
         ]
 
-        # 添加到列表
-        for display_name, control_type in controls:
-            # 直接使用字符串添加项
-            self.control_list.addItem(display_name)
-            # 获取最后一项并设置数据
-            last_item = self.control_list.item(self.control_list.count() - 1)
-            last_item.setData(Qt.UserRole, control_type)
+        # 定义控件分类映射
+        category_map = {
+            "文本类": [
+                "text_replace", "add_text", "case_convert", "text_split",
+                "text_merge", "text_search_delete", "remove_duplicate",
+                "remove_empty_lines", "text_trim"
+            ],
+            "JSON类": [
+                "json_format", "json_compress"
+            ],
+            "格式化类": [
+                "json_format", "json_compress", "xml_format", "html_format"
+            ],
+            "日期类": [
+                "datetime_convert", "random_datetime"
+            ],
+            "随机类": [
+                "random_datetime"
+            ],
+            "Excel类": [
+                "read_excel_column", "excel_to_json"
+            ]
+        }
+
+        # 构建控件类型到显示名称的映射
+        control_name_map = {control_type: display_name for display_name, control_type in controls}
+
+        # 创建分类节点
+        for category_name, control_types in category_map.items():
+            # 创建父节点
+            parent_item = QTreeWidgetItem(self.control_list)
+            parent_item.setText(0, category_name)
+            parent_item.setFlags(parent_item.flags() | Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # 父节点也可以选中
+            parent_item.setExpanded(True)  # 默认展开
+
+            # 添加子节点
+            for control_type in control_types:
+                if control_type in control_name_map:
+                    child_item = QTreeWidgetItem(parent_item)
+                    child_item.setText(0, control_name_map[control_type])
+                    child_item.setData(0, Qt.UserRole, control_type)
+
+        # 全部展开
+        self.control_list.expandAll()
 
     def _on_selection_changed(self, current, previous):
         """
@@ -186,14 +229,18 @@ class ControlDialog(CustomDialog):
 
         if current is not None:
             # 获取选中的控件类型
-            control_type = current.data(Qt.UserRole)
+            control_type = current.data(0, Qt.UserRole)
             self.selected_control = control_type
 
-            # 启用确定按钮
-            self.ok_button.setEnabled(True)
-
-            # 更新预览
-            self._update_preview(control_type)
+            # 如果是分类节点（没有control_type），禁用确定按钮
+            if control_type is not None:
+                # 启用确定按钮
+                self.ok_button.setEnabled(True)
+                # 更新预览
+                self._update_preview(control_type)
+            else:
+                # 分类节点不允许选择
+                self.ok_button.setEnabled(False)
         else:
             # 没有选中任何项
             self.selected_control = None
@@ -498,6 +545,20 @@ class ControlDialog(CustomDialog):
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
+        elif control_type == "excel_to_json":
+            # Excel转JSON控件预览
+            from controls.excel_to_json import ExcelToJsonControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = ExcelToJsonControl()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
 
     def _on_ok_clicked(self):
         """
@@ -513,7 +574,7 @@ class ControlDialog(CustomDialog):
         """
         if item:
             # 获取选中的控件类型
-            self.selected_control = item.data(Qt.UserRole)
+            self.selected_control = item.data(0, Qt.UserRole)
             # 发出信号
             self.control_selected.emit(self.selected_control)
             # 关闭对话框，返回 Accepted

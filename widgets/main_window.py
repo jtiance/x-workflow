@@ -481,6 +481,10 @@ class MainWindow(QMainWindow):
             from controls.random_datetime import RandomDatetimeControl
             control = RandomDatetimeControl()
             tab_content.add_control(control)
+        elif control_type == "excel_to_json":
+            from controls.excel_to_json import ExcelToJsonControl
+            control = ExcelToJsonControl()
+            tab_content.add_control(control)
 
     def _show_about(self):
         """
