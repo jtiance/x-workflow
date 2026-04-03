@@ -4,13 +4,13 @@
 包含单个标签页的内容（左侧控制面板 + 右侧文本编辑器）
 """
 
-import json
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QSplitter, QVBoxLayout, QLabel, QFileDialog, QApplication, QFrame
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QSplitter, QVBoxLayout, QLabel, QApplication, QFrame
 from PySide6.QtCore import Qt, Signal, QThread, QObject
 
 from widgets.control_panel import ControlPanel
 from widgets.text_editor import TextEditor
-from widgets.workflow_dialogs import SaveWorkflowDialog, WorkflowManagerDialog
+from dialogs.workflow_dialogs import SaveWorkflowDialog, WorkflowManagerDialog
+from dialogs.export_dialog import ExportDialog
 from widgets.arrow_button import ArrowButton
 from workflow_manager import get_workflow_manager
 
@@ -208,6 +208,8 @@ class TabContent(QWidget):
         self.control_panel.load_requested.connect(self._on_load_clicked)
         # 连接保存按钮信号
         self.control_panel.save_requested.connect(self._on_save_clicked)
+        # 连接导出按钮信号
+        self.control_panel.export_requested.connect(self._on_export_clicked)
         
     def _on_execute_clicked(self):
         """
@@ -551,7 +553,7 @@ class TabContent(QWidget):
     def set_status(self, message, is_error=False):
         """
         设置状态栏消息
-        
+
         Args:
             message: 要显示的消息
             is_error: 是否是错误消息
@@ -561,6 +563,55 @@ class TabContent(QWidget):
             self.status_label.setStyleSheet("padding-left: 10px; color: #ff6b6b;")
         else:
             self.status_label.setStyleSheet("padding-left: 10px; color: white;")
+
+    def _on_export_clicked(self):
+        """
+        当点击导出按钮时调用
+        打开导出对话框并处理导出
+        """
+        # 创建导出对话框
+        dialog = ExportDialog(self)
+
+        # 连接导出确认信号
+        def on_export_confirmed(folder_path, fmt):
+            self._do_export(folder_path, fmt)
+
+        dialog.export_confirmed.connect(on_export_confirmed)
+
+        # 显示对话框
+        dialog.exec()
+
+    def _do_export(self, folder_path, fmt):
+        """
+        执行实际的导出操作
+
+        Args:
+            folder_path: 导出目录路径
+            fmt: 文件格式
+        """
+        import os
+        from PySide6.QtWidgets import QMessageBox
+        from datetime import datetime
+
+        try:
+            # 获取当前文本
+            text = self.text_editor.get_text()
+
+            # 生成文件名（使用时间戳）
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"export_{timestamp}.{fmt}"
+            filepath = os.path.join(folder_path, filename)
+
+            # 写入文件
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(text)
+
+            self.set_status(f"已导出到: {filename}", is_error=False)
+
+        except Exception as e:
+            error_msg = str(e)
+            QMessageBox.warning(self, "导出失败", f"导出文件时出错: {error_msg}")
+            self.set_status(f"导出失败: {error_msg}", is_error=True)
         
     def get_control_panel(self):
         """

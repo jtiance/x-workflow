@@ -5,15 +5,14 @@
 """
 
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QMenuBar, QMenu
+    QMainWindow, QWidget, QVBoxLayout, QMenu
 )
 from qfluentwidgets import TabWidget
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QKeySequence, QShortcut
 
 from components.custom_tab_bar import CustomTabBar
 from widgets.tab_widget import TabContent
-from widgets.control_dialog import ControlDialog
+from dialogs.control_dialog import ControlDialog
 from workflow_manager import get_workflow_manager
 
 
@@ -96,7 +95,6 @@ class MainWindow(QMainWindow):
 
         # 设置标签页样式 - 使用 qfluentwidgets API 而不是 setStyleSheet
         # 因为 qfluentwidgets 使用自定义绘制，QSS 不会生效
-        from PySide6.QtGui import QColor
 
         # 设置标签页宽度范围
         self.tab_widget.tabBar.tabMaxWidth = 200

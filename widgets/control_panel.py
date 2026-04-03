@@ -28,6 +28,8 @@ class ControlPanel(QWidget):
     load_requested = Signal()
     # 定义信号：当点击保存按钮时发出
     save_requested = Signal()
+    # 定义信号：当点击导出按钮时发出
+    export_requested = Signal()
 
     def __init__(self, parent=None):
         """
@@ -149,7 +151,7 @@ class ControlPanel(QWidget):
         # 1. 创建菜单
         self.round_menu = RoundMenu(parent=self)
         self.round_menu.addActions([
-            Action(FluentIcon.IMAGE_EXPORT, "导出", triggered=lambda: print("export"))
+            Action(FluentIcon.IMAGE_EXPORT, "导出", triggered=lambda checked: self.export_requested.emit())
         ])
 
     def set_save_button_text(self, text):
