@@ -13,6 +13,9 @@ from .text_search_delete import TextSearchDeleteControl
 from .remove_duplicate import RemoveDuplicateControl
 from .remove_empty_lines import RemoveEmptyLinesControl
 from .text_trim import TextTrimControl
-from .read_excel_column import ReadExcelColumn
+from .read_excel_column import ReadExcelColumnControl
+from .datetime_convert import DatetimeConvertControl
+from .random_datetime import RandomDatetimeControl
 
-__all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl', 'RemoveDuplicateControl', 'RemoveEmptyLinesControl', 'TextTrimControl', 'ReadExcelColumn']
+__all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl', 'RemoveDuplicateControl', 'RemoveEmptyLinesControl', 'TextTrimControl',
+           'ReadExcelColumnControl', 'DatetimeConvertControl', 'RandomDatetimeControl']

@@ -23,7 +23,7 @@ SEPARATOR_MAP = {
 }
 
 
-class ReadExcelColumn(BaseControl):
+class ReadExcelColumnControl(BaseControl):
     """
     读取Excel列控件类
     读取Excel文件的指定列，按分隔符连接后输出文本

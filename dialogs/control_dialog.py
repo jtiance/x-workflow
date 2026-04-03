@@ -161,6 +161,8 @@ class ControlDialog(CustomDialog):
             ("移除空行", "remove_empty_lines"),
             ("文本裁剪", "text_trim"),
             ("读取Excel列", "read_excel_column"),
+            ("日期时间转换", "datetime_convert"),
+            ("随机时间生成", "random_datetime"),
         ]
 
         # 添加到列表
@@ -454,10 +456,40 @@ class ControlDialog(CustomDialog):
 
         elif control_type == "read_excel_column":
             # 读取Excel列控件预览
-            from controls.read_excel_column import ReadExcelColumn
+            from controls.read_excel_column import ReadExcelColumnControl
 
             # 创建预览控件（禁用交互，只用于显示）
-            preview_control = ReadExcelColumn()
+            preview_control = ReadExcelColumnControl()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
+        elif control_type == "datetime_convert":
+            # 日期时间转换控件预览
+            from controls.datetime_convert import DatetimeConvertControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = DatetimeConvertControl()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
+        elif control_type == "random_datetime":
+            # 随机时间生成控件预览
+            from controls.random_datetime import RandomDatetimeControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = RandomDatetimeControl()
             preview_control.setEnabled(False)
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):

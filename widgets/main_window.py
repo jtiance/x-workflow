@@ -470,8 +470,16 @@ class MainWindow(QMainWindow):
             tab_content.add_control(control)
 
         elif control_type == "read_excel_column":
-            from controls.read_excel_column import ReadExcelColumn
-            control = ReadExcelColumn()
+            from controls.read_excel_column import ReadExcelColumnControl
+            control = ReadExcelColumnControl()
+            tab_content.add_control(control)
+        elif control_type == "datetime_convert":
+            from controls.datetime_convert import DatetimeConvertControl
+            control = DatetimeConvertControl()
+            tab_content.add_control(control)
+        elif control_type == "random_datetime":
+            from controls.random_datetime import RandomDatetimeControl
+            control = RandomDatetimeControl()
             tab_content.add_control(control)
 
     def _show_about(self):
