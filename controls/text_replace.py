@@ -109,7 +109,7 @@ class TextReplaceControl(BaseControl):
         
         # 第4行：替换选项
         self.escape_checkbox = TogglePushButton("/r/n")
-        self.escape_checkbox.setChecked(True)
+        self.escape_checkbox.setChecked(False)
         self.escape_checkbox.setToolTip("替换转义字符")
         self.escape_checkbox.setFixedWidth(50)
         self.escape_checkbox.clicked.connect(self._emit_parameters_changed)

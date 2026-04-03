@@ -62,7 +62,7 @@ class TextTrimControl(BaseControl):
         grid_layout.addWidget(self.direction_combo, 1, 1)
         
         # 第 3 行：是否裁剪匹配的文本
-        include_label = BodyLabel("裁剪匹配的文本:")
+        include_label = BodyLabel("包含匹配的文本:")
         include_label.setMinimumWidth(70)
         include_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         

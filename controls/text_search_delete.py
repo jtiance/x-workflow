@@ -24,12 +24,12 @@ class TextSearchDeleteControl(BaseControl):
         Args:
             parent: 父控件
         """
-        super().__init__("文本搜索删除", parent)
+        super().__init__("文本行删除", parent)
         
     def _init_content(self):
         """
         初始化内容区域
-        添加文本搜索删除相关的控件
+        添加文本行删除相关的控件
         """
         layout = self.get_content_layout()
         
@@ -169,7 +169,7 @@ class TextSearchDeleteControl(BaseControl):
     
     def execute(self, text):
         """
-        执行文本搜索删除操作
+        执行文本行删除操作
         
         Args:
             text: 要处理的文本

@@ -440,7 +440,7 @@ class MainWindow(QMainWindow):
             tab_content.add_control(control)
             
         elif control_type == "text_search_delete":
-            # 创建文本搜索删除控件
+            # 创建文本行删除控件
             from controls.text_search_delete import TextSearchDeleteControl
             control = TextSearchDeleteControl()
             # 添加到标签页

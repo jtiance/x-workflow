@@ -156,7 +156,7 @@ class ControlDialog(CustomDialog):
             ("大小写转换", "case_convert"),
             ("文本分割", "text_split"),
             ("文本合并", "text_merge"),
-            ("文本搜索删除", "text_search_delete"),
+            ("文本行删除", "text_search_delete"),
             ("移除重复行", "remove_duplicate"),
             ("移除空行", "remove_empty_lines"),
             ("文本裁剪", "text_trim"),
@@ -387,7 +387,7 @@ class ControlDialog(CustomDialog):
             self.preview_layout.addStretch()
 
         elif control_type == "text_search_delete":
-            # 文本搜索删除控件预览
+            # 文本行删除控件预览
             from controls.text_search_delete import TextSearchDeleteControl
 
             # 创建预览控件（禁用交互，只用于显示）

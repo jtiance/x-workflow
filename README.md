@@ -129,7 +129,7 @@ x-workflow/
 │   ├── __init__.py
 │   ├── base_control.py         # 控件基类
 │   ├── text_replace.py         # 文本替换控件
-│   ├── text_search_delete.py   # 文本搜索删除控件
+│   ├── text_search_delete.py   # 文本行删除控件
 │   ├── json_format.py          # JSON格式化控件
 │   ├── json_compress.py        # JSON压缩控件
 │   ├── html_format.py          # HTML格式化控件
@@ -211,7 +211,7 @@ x-workflow/
 - **功能**：在文本中查找并替换指定内容
 - **参数**：查找文本、替换文本
 
-### 文本搜索删除 (text_search_delete)
+### 文本行删除 (text_search_delete)
 
 - **功能**：查找包含或不含特定文本的行并删除
 - **参数**：查询文本、匹配模式、删除模式、区分大小写、是否使用正则表达式
