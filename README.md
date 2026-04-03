@@ -78,10 +78,25 @@ python main.py
 
 ## 打包发布
 
-使用 PyInstaller 打包成可执行文件：
+### 使用 Poetry 打包
 
 ```bash
 poetry run pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --add-data "workflow-config.json:." --add-data "X-Workflow.png:." --add-data "X-Workflow.icns:." main.py
+```
+
+### 最简打包方法（不使用 Poetry）
+
+如果不想使用 Poetry，可以直接使用 pip 安装依赖并打包：
+
+```bash
+# 安装 PyInstaller
+python3 -m pip install pyinstaller -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
+
+# 安装项目依赖
+python3 -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
+
+# 执行打包
+pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --add-data "workflow-config.json:." --add-data "X-Workflow.png:." --add-data "X-Workflow.icns:." main.py
 ```
 
 打包完成后，可执行文件位于 `dist/X-Workflow` 目录下。
