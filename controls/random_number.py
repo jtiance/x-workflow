@@ -27,7 +27,7 @@ class RandomNumberControl(BaseControl):
         """
         super().__init__("随机数字生成", parent)
         # 标记是否由类型选择导致的小数位数禁用
-        self._decimal_disabled_by_type = False
+        self._decimal_disabled_by_type = True
 
     def _init_content(self):
         """
@@ -147,7 +147,7 @@ class RandomNumberControl(BaseControl):
         else:
             # 如果是整数类型，小数位数始终禁用
             # 如果是浮点数类型，小数位数启用
-            self.decimal_digits_spin.setEnabled(self._decimal_disabled_by_type)
+            self.decimal_digits_spin.setEnabled(not self._decimal_disabled_by_type)
 
     def execute(self, text):
         """
