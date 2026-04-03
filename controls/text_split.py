@@ -11,11 +11,11 @@ from qfluentwidgets import ComboBox, BodyLabel, LineEdit, SpinBox
 from controls.base_control import BaseControl
 
 DELIMITER_MAP = {
-    "逗号": ",",
-    "分号": ";",
-    "竖线": "|",
-    "空格": " ",
-    "制表符": "\t",
+    "逗号 ( , )": ",",
+    "分号 ( ; )": ";",
+    "竖线 ( | )": "|",
+    "空格 ( )": " ",
+    "制表符 (\\t)": "\t",
     "自定义": None
 }
 
@@ -68,7 +68,7 @@ class TextSplitControl(BaseControl):
         
         self.delimiter_combo = ComboBox()
         self.delimiter_combo.addItems(list(DELIMITER_MAP.keys()))
-        self.delimiter_combo.setCurrentText("逗号")
+        self.delimiter_combo.setCurrentText("逗号 ( , )")
         self.delimiter_combo.currentTextChanged.connect(self._on_delimiter_changed)
         self.delimiter_combo.currentTextChanged.connect(self._emit_parameters_changed)
         self.delimiter_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -224,7 +224,7 @@ class TextSplitControl(BaseControl):
         重置参数到默认值
         """
         self.mode_combo.setCurrentText("按分隔符分割")
-        self.delimiter_combo.setCurrentText("逗号")
+        self.delimiter_combo.setCurrentText("逗号 ( , )")
         self.custom_delimiter_input.setText("")
         self.custom_delimiter_input.setVisible(False)
         self.length_spin.setValue(10)

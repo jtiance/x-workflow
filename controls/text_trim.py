@@ -54,8 +54,8 @@ class TextTrimControl(BaseControl):
         direction_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.direction_combo = ComboBox()
-        self.direction_combo.addItem("裁剪掉左侧的字符串", "before")
-        self.direction_combo.addItem("裁剪掉右侧的字符串", "after")
+        self.direction_combo.addItem("裁剪掉左侧的字符串", userData="before")
+        self.direction_combo.addItem("裁剪掉右侧的字符串", userData="after")
         self.direction_combo.currentIndexChanged.connect(self._emit_parameters_changed)
         
         grid_layout.addWidget(direction_label, 1, 0)
@@ -67,8 +67,8 @@ class TextTrimControl(BaseControl):
         include_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         self.include_combo = ComboBox()
-        self.include_combo.addItem("是", False)
-        self.include_combo.addItem("否", True)
+        self.include_combo.addItem("是", userData=False)
+        self.include_combo.addItem("否", userData=True)
         self.include_combo.currentIndexChanged.connect(self._emit_parameters_changed)
         
         grid_layout.addWidget(include_label, 2, 0)
@@ -99,7 +99,7 @@ class TextTrimControl(BaseControl):
     def get_include(self):
         """
         获取是否包含匹配的字符串
-        
+
         Returns:
             bool: 是否包含匹配的字符串
         """

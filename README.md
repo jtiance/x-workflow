@@ -124,7 +124,6 @@ x-workflow/
 │   ├── custom_text_edit.py     # 自定义文本编辑器
 │   ├── custom_tab_bar.py       # 自定义标签栏
 │   ├── custom_tab_item.py     # 自定义标签项
-│   ├── custom_buttons.py       # 自定义按钮
 │   └── syntax_highlighter.py   # 语法高亮器
 ├── controls/                    # 流程控件
 │   ├── __init__.py

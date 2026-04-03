@@ -6,9 +6,8 @@
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QGridLayout, QSizePolicy)
-from qfluentwidgets import ComboBox, BodyLabel, LineEdit, SpinBox, SwitchButton
+from qfluentwidgets import ComboBox, BodyLabel, LineEdit, SpinBox, SwitchButton, TogglePushButton
 
-from components.custom_buttons import CheckablePushButton
 from controls.base_control import BaseControl
 
 SEPARATOR_MAP = {
@@ -17,6 +16,7 @@ SEPARATOR_MAP = {
     "逗号 ( , )": ",",
     "分号 ( ; )": ";",
     "竖线 ( | )": "|",
+    "制表符 (\\t)": "\t",
     "自定义": None
 }
 
@@ -80,14 +80,14 @@ class TextMergeControl(BaseControl):
         button_layout.setSpacing(5)
 
         # 去除每行前后空白按钮
-        self.trim_checkbox = CheckablePushButton("删除空白")
+        self.trim_checkbox = TogglePushButton("删除空白")
         self.trim_checkbox.setChecked(False)
         self.trim_checkbox.setToolTip("删除文本前后的空白字符")
         self.trim_checkbox.clicked.connect(self._emit_parameters_changed)
         self.trim_checkbox.setFixedWidth(90)
 
         # 过滤空行按钮
-        self.filter_checkbox = CheckablePushButton("忽略空行")
+        self.filter_checkbox = TogglePushButton("忽略空行")
         self.filter_checkbox.setChecked(True)
         self.filter_checkbox.setToolTip("空行不增加额外连接符")
         self.filter_checkbox.clicked.connect(self._emit_parameters_changed)
