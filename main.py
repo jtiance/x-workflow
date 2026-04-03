@@ -53,18 +53,28 @@ def main():
     主函数
     程序的入口点
     """
+    # 在创建任何Qt对象之前设置默认字体，解决Segoe UI缺失警告
+    import os
+    os.environ["QT_FONT_FAMILY"] = ".AppleSystemUIFont"
+
     # 初始化配置文件
     initialize_config()
-    
-    # 启用高 DPI 支持
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
+    # Qt 6 已默认启用高DPI支持，无需手动设置
+    # 以下属性在Qt 6中已废弃
+    # QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    # QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     
     # 创建应用程序实例
     app = QApplication(sys.argv)
     
     # 设置应用程序名称
     app.setApplicationName("X-Workflow")
+
+    # 设置默认字体
+    from PySide6.QtGui import QFont
+    font = QFont(".AppleSystemUIFont", 13)
+    app.setFont(font)
     
     # 设置应用程序图标
     from PySide6.QtGui import QIcon

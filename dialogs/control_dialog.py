@@ -110,9 +110,9 @@ class ControlDialog(CustomDialog):
         self.preview_layout.setContentsMargins(10, 10, 10, 10)
 
         # 初始提示标签
-        self.preview_hint = QLabel("请从左侧选择一个控件")
-        self.preview_hint.setAlignment(Qt.AlignCenter)
-        self.preview_layout.addWidget(self.preview_hint)
+        # self.preview_hint = QLabel("请从左侧选择一个控件")
+        # self.preview_hint.setAlignment(Qt.AlignCenter)
+        # self.preview_layout.addWidget(self.preview_hint)
 
         # ============= 添加到网格布局 =============
         # 第一行：标题
@@ -197,9 +197,9 @@ class ControlDialog(CustomDialog):
             self.ok_button.setEnabled(False)
 
             # 显示提示
-            self.preview_hint = QLabel("请从左侧选择一个控件")
-            self.preview_hint.setAlignment(Qt.AlignCenter)
-            self.preview_layout.addWidget(self.preview_hint)
+            # self.preview_hint = QLabel("请从左侧选择一个控件")
+            # self.preview_hint.setAlignment(Qt.AlignCenter)
+            # self.preview_layout.addWidget(self.preview_hint)
 
     def _clear_preview(self):
         """
