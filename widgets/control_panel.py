@@ -132,6 +132,28 @@ class ControlPanel(QWidget):
         self.run_button.setMinimumWidth(60)  # 设置最小宽度，更窄
         self.run_button.clicked.connect(self.run_requested.emit)
 
+        # 设置自定义颜色样式
+        self.run_button.setStyleSheet("""
+            PushButton {
+                background-color: #009faa;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            PushButton:hover {
+                background-color: #007780;
+            }
+            PushButton:pressed {
+                background-color: #005055;
+            }
+            PushButton:disabled {
+                background-color: #cccccc;
+                color: #666666;
+            }
+        """)
+
         # 添加按钮到布局（左侧固定10px间距，按钮可拉伸）
         button_layout.addSpacing(10)
         button_layout.addWidget(self.run_button, 1)  # 伸展因子1
