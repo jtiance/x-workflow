@@ -273,9 +273,18 @@ class ControlPanel(QWidget):
         from controls.text_split import TextSplitControl
         from controls.text_merge import TextMergeControl
         from controls.text_search_delete import TextSearchDeleteControl
+        from controls.delete_lines import DeleteLinesControl
         from controls.remove_duplicate import RemoveDuplicateControl
         from controls.remove_empty_lines import RemoveEmptyLinesControl
         from controls.text_trim import TextTrimControl
+        from controls.xml_format import XmlFormatControl
+        from controls.html_format import HtmlFormatControl
+        from controls.read_excel_column import ReadExcelColumnControl
+        from controls.datetime_convert import DatetimeConvertControl
+        from controls.random_datetime import RandomDatetimeControl
+        from controls.excel_to_json import ExcelToJsonControl
+        from controls.random_number import RandomNumberControl
+        from controls.html_extract import HtmlExtractControl
 
         for config in configs:
             control_type = config.get("type")
@@ -312,6 +321,10 @@ class ControlPanel(QWidget):
                 control = TextSearchDeleteControl()
                 control.load_config(config)
                 self.add_control(control)
+            elif control_type == "delete_lines":
+                control = DeleteLinesControl()
+                control.load_config(config)
+                self.add_control(control)
             elif control_type == "remove_duplicate":
                 control = RemoveDuplicateControl()
                 control.load_config(config)
@@ -322,6 +335,38 @@ class ControlPanel(QWidget):
                 self.add_control(control)
             elif control_type == "text_trim":
                 control = TextTrimControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "xml_format":
+                control = XmlFormatControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "html_format":
+                control = HtmlFormatControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "read_excel_column":
+                control = ReadExcelColumnControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "datetime_convert":
+                control = DatetimeConvertControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "random_datetime":
+                control = RandomDatetimeControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "excel_to_json":
+                control = ExcelToJsonControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "random_number":
+                control = RandomNumberControl()
+                control.load_config(config)
+                self.add_control(control)
+            elif control_type == "html_extract":
+                control = HtmlExtractControl()
                 control.load_config(config)
                 self.add_control(control)
 

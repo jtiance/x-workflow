@@ -157,11 +157,13 @@ class ControlDialog(CustomDialog):
             ("JSON压缩", "json_compress"),
             ("XML格式化", "xml_format"),
             ("HTML格式化", "html_format"),
+            ("HTML文本提取", "html_extract"),
             ("增加文本", "add_text"),
             ("大小写转换", "case_convert"),
             ("文本分割", "text_split"),
             ("文本合并", "text_merge"),
             ("文本行删除", "text_search_delete"),
+            ("删除指定行", "delete_lines"),
             ("移除重复行", "remove_duplicate"),
             ("移除空行", "remove_empty_lines"),
             ("文本裁剪", "text_trim"),
@@ -176,8 +178,8 @@ class ControlDialog(CustomDialog):
         category_map = {
             "文本类": [
                 "text_replace", "add_text", "case_convert", "text_split",
-                "text_merge", "text_search_delete", "remove_duplicate",
-                "remove_empty_lines", "text_trim"
+                "text_merge", "text_search_delete", "delete_lines", "remove_duplicate",
+                "remove_empty_lines", "text_trim", "html_extract"
             ],
             "JSON类": [
                 "json_format", "json_compress"
@@ -457,6 +459,25 @@ class ControlDialog(CustomDialog):
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
 
+        elif control_type == "delete_lines":
+            # 删除指定行控件预览
+            from controls.delete_lines import DeleteLinesControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = DeleteLinesControl()
+            preview_control.setEnabled(False)  # 禁用交互
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 设置一些示例数据
+            preview_control.set_start_line(1)
+            preview_control.set_end_line(10)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
         elif control_type == "remove_duplicate":
             # 移除重复行控件预览
             from controls.remove_duplicate import RemoveDuplicateControl
@@ -573,6 +594,25 @@ class ControlDialog(CustomDialog):
             # 隐藏操作按钮
             if hasattr(preview_control, 'set_buttons_visible'):
                 preview_control.set_buttons_visible(False)
+
+            # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
+        elif control_type == "html_extract":
+            # HTML文本提取控件预览
+            from controls.html_extract import HtmlExtractControl
+
+            # 创建预览控件（禁用交互，只用于显示）
+            preview_control = HtmlExtractControl()
+            preview_control.setEnabled(False)
+            # 隐藏操作按钮
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            # 设置一些示例数据
+            preview_control.set_mode("visible_text")
+            preview_control.set_whitespace_mode("remove_empty")
 
             # 添加到预览区域
             self.preview_layout.addWidget(preview_control)

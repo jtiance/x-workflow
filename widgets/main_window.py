@@ -445,6 +445,13 @@ class MainWindow(QMainWindow):
             control = TextSearchDeleteControl()
             # 添加到标签页
             tab_content.add_control(control)
+
+        elif control_type == "delete_lines":
+            # 创建删除指定行控件
+            from controls.delete_lines import DeleteLinesControl
+            control = DeleteLinesControl()
+            # 添加到标签页
+            tab_content.add_control(control)
             
         elif control_type == "remove_duplicate":
             from controls.remove_duplicate import RemoveDuplicateControl
@@ -488,6 +495,10 @@ class MainWindow(QMainWindow):
         elif control_type == "random_number":
             from controls.random_number import RandomNumberControl
             control = RandomNumberControl()
+            tab_content.add_control(control)
+        elif control_type == "html_extract":
+            from controls.html_extract import HtmlExtractControl
+            control = HtmlExtractControl()
             tab_content.add_control(control)
 
     def _show_about(self):

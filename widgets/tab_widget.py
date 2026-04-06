@@ -569,44 +569,61 @@ class TabContent(QWidget):
         当点击导出按钮时调用
         打开导出对话框并处理导出
         """
+        # 获取当前文本，用于生成默认文件名
+        current_text = self.text_editor.get_text()
+
         # 创建导出对话框
-        dialog = ExportDialog(self)
+        dialog = ExportDialog(current_text, self)
 
         # 连接导出确认信号
-        def on_export_confirmed(folder_path, fmt):
-            self._do_export(folder_path, fmt)
+        def on_export_confirmed(folder_path, filename, fmt):
+            self._do_export(folder_path, filename, fmt)
 
         dialog.export_confirmed.connect(on_export_confirmed)
 
         # 显示对话框
         dialog.exec()
 
-    def _do_export(self, folder_path, fmt):
+    def _do_export(self, folder_path, filename, fmt):
         """
         执行实际的导出操作
 
         Args:
             folder_path: 导出目录路径
+            filename: 文件名（不含扩展名）
             fmt: 文件格式
         """
         import os
         from PySide6.QtWidgets import QMessageBox
-        from datetime import datetime
 
         try:
             # 获取当前文本
             text = self.text_editor.get_text()
 
-            # 生成文件名（使用时间戳）
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"export_{timestamp}.{fmt}"
-            filepath = os.path.join(folder_path, filename)
+            # 分离文件名和扩展名（如果filename已经包含扩展名）
+            base_name, ext = os.path.splitext(filename)
+            if not ext:
+                ext = f".{fmt}"
+
+            # 生成唯一的文件名
+            counter = 0
+            while True:
+                if counter == 0:
+                    current_filename = f"{base_name}{ext}"
+                else:
+                    current_filename = f"{base_name}_{counter}{ext}"
+
+                filepath = os.path.join(folder_path, current_filename)
+
+                if not os.path.exists(filepath):
+                    break
+                counter += 1
 
             # 写入文件
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(text)
 
-            self.set_status(f"已导出到: {filename}", is_error=False)
+            self.set_status(f"已导出到: {current_filename}", is_error=False)
 
         except Exception as e:
             error_msg = str(e)
