@@ -9,6 +9,7 @@ from PySide6.QtCore import Qt, Signal, QThread, QObject
 
 from widgets.control_panel import ControlPanel
 from widgets.text_editor import TextEditor
+from widgets.text_search_replace import TextSearchReplace
 from dialogs.workflow_dialogs import SaveWorkflowDialog, WorkflowManagerDialog
 from dialogs.export_dialog import ExportDialog
 from widgets.arrow_button import ArrowButton
@@ -156,10 +157,15 @@ class TabContent(QWidget):
         self.control_panel = ControlPanel()
         self.control_panel.setObjectName("TabControlPanel")
         
+        # ============= 搜索替换组件 =============
+        self.text_search_replace = TextSearchReplace()
+        self.text_search_replace.setObjectName("TabTextSearchReplace")
+        self.text_search_replace.hide()
+
         # ============= 右侧：文本编辑器 =============
         self.text_editor = TextEditor()
         self.text_editor.setObjectName("TabTextEditor")
-        
+
         # ============= 箭头按钮列表 =============
         self.button_list_widget = QFrame()
         self.button_list_widget.setMinimumHeight(60)  # 设置固定高度
@@ -168,8 +174,9 @@ class TabContent(QWidget):
         self.button_list_layout.setContentsMargins(10, 5, 10, 0)  # 右侧间隙10px
         self.button_list_layout.setSpacing(5)
         self.button_list_layout.setAlignment(Qt.AlignLeft)  # 靠左对齐
-        
-        # 将文本编辑器和按钮列表添加到右侧容器
+
+        # 将搜索替换组件、文本编辑器和按钮列表添加到右侧容器
+        right_layout.addWidget(self.text_search_replace)
         right_layout.addWidget(self.text_editor, 1)  # 文本编辑器占剩余空间
         right_layout.addWidget(self.button_list_widget)  # 按钮列表
         
@@ -210,6 +217,14 @@ class TabContent(QWidget):
         self.control_panel.save_requested.connect(self._on_save_clicked)
         # 连接导出按钮信号
         self.control_panel.export_requested.connect(self._on_export_clicked)
+
+        # 连接搜索替换组件信号
+        self.text_search_replace.search_requested.connect(self._on_search_requested)
+        self.text_search_replace.find_next_requested.connect(self._on_find_next)
+        self.text_search_replace.find_previous_requested.connect(self._on_find_previous)
+        self.text_search_replace.replace_current_requested.connect(self._on_replace_current)
+        self.text_search_replace.replace_all_requested.connect(self._on_replace_all)
+        self.text_search_replace.close_requested.connect(self.hide_search_replace)
         
     def _on_execute_clicked(self):
         """
@@ -651,9 +666,139 @@ class TabContent(QWidget):
     def add_control(self, control_widget):
         """
         向控制面板添加控件
-        
+
         Args:
             control_widget: 要添加的控件
         """
         # 添加控件到面板
         self.control_panel.add_control(control_widget)
+
+    def show_search(self):
+        """显示搜索组件（单行模式）"""
+        self.text_search_replace.show_search_mode()
+
+        # 如果有选中的文本，自动填充到搜索框
+        cursor = self.text_editor.text_edit.textCursor()
+        if cursor.hasSelection():
+            selected_text = cursor.selectedText()
+            self.text_search_replace.search_input.setText(selected_text)
+
+        # 连接文本编辑器内容变化信号，自动重新搜索
+        # 先断开之前的连接（如果存在）
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            self.text_editor.text_changed.disconnect(self._on_text_editor_content_changed)
+        self.text_editor.text_changed.connect(self._on_text_editor_content_changed)
+
+        # 执行搜索
+        self._on_search_requested(
+            self.text_search_replace.get_search_pattern(),
+            self.text_search_replace.is_case_sensitive(),
+            self.text_search_replace.use_regex()
+        )
+
+    def show_replace(self):
+        """显示替换组件（双行模式）"""
+        self.text_search_replace.show_replace_mode()
+
+        # 如果有选中的文本，自动填充到搜索框
+        cursor = self.text_editor.text_edit.textCursor()
+        if cursor.hasSelection():
+            selected_text = cursor.selectedText()
+            self.text_search_replace.search_input.setText(selected_text)
+
+        # 连接文本编辑器内容变化信号，自动重新搜索
+        # 先断开之前的连接（如果存在）
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            self.text_editor.text_changed.disconnect(self._on_text_editor_content_changed)
+        self.text_editor.text_changed.connect(self._on_text_editor_content_changed)
+
+        # 执行搜索
+        self._on_search_requested(
+            self.text_search_replace.get_search_pattern(),
+            self.text_search_replace.is_case_sensitive(),
+            self.text_search_replace.use_regex()
+        )
+
+    def hide_search_replace(self):
+        """隐藏搜索替换组件"""
+        self.text_search_replace.hide()
+        self.text_editor.clear_search_highlight()
+
+        # 断开文本编辑器内容变化信号
+        try:
+            self.text_editor.text_changed.disconnect(self._on_text_editor_content_changed)
+        except:
+            pass
+
+        # 恢复焦点到文本编辑器
+        self.text_editor.setFocus()
+
+    def _on_search_requested(self, pattern, case_sensitive, use_regex):
+        """处理搜索请求"""
+        total = self.text_editor.find_all(pattern, case_sensitive, use_regex)
+        current = self.text_editor.get_current_match_index() + 1 if total > 0 else 0
+
+        # 更新匹配计数
+        if self.text_search_replace.isVisible():
+            self.text_search_replace.update_match_count(current, total)
+
+    def _on_find_next(self):
+        """查找下一个匹配项"""
+        self.text_editor.find_next()
+        total = self.text_editor.get_match_count()
+        current = self.text_editor.get_current_match_index() + 1 if total > 0 else 0
+
+        # 更新匹配计数
+        if self.text_search_replace.isVisible():
+            self.text_search_replace.update_match_count(current, total)
+
+    def _on_find_previous(self):
+        """查找上一个匹配项"""
+        self.text_editor.find_previous()
+        total = self.text_editor.get_match_count()
+        current = self.text_editor.get_current_match_index() + 1 if total > 0 else 0
+
+        # 更新匹配计数
+        if self.text_search_replace.isVisible():
+            self.text_search_replace.update_match_count(current, total)
+
+    def _on_replace_current(self, replace_str):
+        """替换当前匹配项"""
+        self.text_editor.replace_current(replace_str)
+        total = self.text_editor.get_match_count()
+        current = self.text_editor.get_current_match_index() + 1 if total > 0 else 0
+
+        # 更新匹配计数
+        if self.text_search_replace.isVisible():
+            self.text_search_replace.update_match_count(current, total)
+
+    def _on_replace_all(self, replace_str):
+        """替换所有匹配项"""
+        count = self.text_editor.replace_all(replace_str)
+        if self.text_search_replace.isVisible():
+            self.text_search_replace.update_match_count(0, 0)
+        self.set_status(f"已替换 {count} 处匹配", is_error=False)
+
+    def _on_text_editor_content_changed(self):
+        """文本编辑器内容变化时触发，自动重新搜索"""
+        if self.text_search_replace.isVisible():
+            # 搜索替换面板显示时，使用组件的参数重新搜索
+            self._on_search_requested(
+                self.text_search_replace.get_search_pattern(),
+                self.text_search_replace.is_case_sensitive(),
+                self.text_search_replace.use_regex()
+            )
+
+    def keyPressEvent(self, event):
+        """处理键盘事件"""
+        if event.key() == Qt.Key_Escape:
+            # 按下Esc键隐藏搜索替换组件
+            if self.text_search_replace.isVisible():
+                self.hide_search_replace()
+                event.accept()
+                return
+        super().keyPressEvent(event)

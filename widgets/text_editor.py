@@ -4,8 +4,9 @@
 提供带行号的代码编辑功能
 """
 
+import re
 from PySide6.QtCore import Qt, Signal, QRect, QSize
-from PySide6.QtGui import QPainter, QColor, QTextFormat
+from PySide6.QtGui import QPainter, QColor, QTextFormat, QTextCursor
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QTextEdit
 # 导入自定义 PlainTextEdit
 from components.custom_text_edit import CustomPlainTextEdit
@@ -185,6 +186,88 @@ class TextEditor(QWidget):
         """
         return self.text_edit.get_language()
 
+    def find_all(self, pattern, case_sensitive=True, use_regex=False):
+        """
+        查找所有匹配项
+
+        Args:
+            pattern: 搜索模式
+            case_sensitive: 是否区分大小写
+            use_regex: 是否使用正则表达式
+
+        Returns:
+            int: 匹配总数
+        """
+        # 保存当前搜索参数
+        self.text_edit._current_search_pattern = pattern
+        self.text_edit._current_case_sensitive = case_sensitive
+        self.text_edit._current_use_regex = use_regex
+        return self.text_edit.find_all(pattern, case_sensitive, use_regex)
+
+    def find_next(self):
+        """
+        跳到下一个匹配项
+
+        Returns:
+            bool: 是否成功
+        """
+        return self.text_edit.find_next()
+
+    def find_previous(self):
+        """
+        跳到上一个匹配项
+
+        Returns:
+            bool: 是否成功
+        """
+        return self.text_edit.find_previous()
+
+    def replace_current(self, replace_str):
+        """
+        替换当前匹配项
+
+        Args:
+            replace_str: 替换文本
+
+        Returns:
+            bool: 是否成功
+        """
+        return self.text_edit.replace_current(replace_str)
+
+    def replace_all(self, replace_str):
+        """
+        替换所有匹配项
+
+        Args:
+            replace_str: 替换文本
+
+        Returns:
+            int: 替换数量
+        """
+        return self.text_edit.replace_all(replace_str)
+
+    def get_current_match_index(self):
+        """
+        获取当前匹配项索引
+
+        Returns:
+            int: 当前索引(从0开始)，没有匹配返回-1
+        """
+        return self.text_edit.get_current_match_index()
+
+    def get_match_count(self):
+        """
+        获取匹配总数
+
+        Returns:
+            int: 匹配总数
+        """
+        return self.text_edit.get_match_count()
+
+    def clear_search_highlight(self):
+        """清除搜索高亮"""
+        self.text_edit.find_all("")
+
 
 class CodeEditor(CustomPlainTextEdit):
     """
@@ -223,6 +306,10 @@ class CodeEditor(CustomPlainTextEdit):
         font.setPointSize(self._font_size)
         self.setFont(font)
         self.update_line_number_area_width(0)
+
+        # 搜索相关属性
+        self._matches = []  # 存储所有匹配项 (start, end) 位置
+        self._current_match_index = -1  # 当前选中的匹配项索引
 
     def line_number_area_width(self):
         """
@@ -320,10 +407,24 @@ class CodeEditor(CustomPlainTextEdit):
         """
         高亮当前行
         """
+        # 获取现有的extra selections
+        all_selections = list(self.extraSelections())
         extra_selections = []
+
+        # 只保留搜索相关的高亮，移除所有行高亮
+        for s in all_selections:
+            # 判断是否是搜索匹配高亮：没有_is_current_line_highlight标记，且背景色不是当前行颜色
+            if hasattr(s, '_is_current_line_highlight'):
+                continue
+            # 检查背景色，排除当前行高亮（可能旧的没有标记）
+            bg_color = s.format.background().color()
+            if bg_color.name() == "#3c3f41":
+                continue
+            extra_selections.append(s)
 
         if not self.isReadOnly():
             selection = QTextEdit.ExtraSelection()
+            selection._is_current_line_highlight = True  # 标记为当前行高亮
 
             # 当前行背景色
             line_color = QColor("#3c3f41")
@@ -331,7 +432,7 @@ class CodeEditor(CustomPlainTextEdit):
             selection.format.setProperty(QTextFormat.FullWidthSelection, True)
             selection.cursor = self.textCursor()
             selection.cursor.clearSelection()
-            extra_selections.append(selection)
+            extra_selections.insert(0, selection)  # 插入到最前面
 
         self.setExtraSelections(extra_selections)
 
@@ -388,3 +489,233 @@ class CodeEditor(CustomPlainTextEdit):
         if self.highlighter:
             return self.highlighter.language
         return 'text'
+
+    def find_all(self, pattern, case_sensitive=True, use_regex=False):
+        """
+        查找所有匹配项
+
+        Args:
+            pattern: 搜索模式
+            case_sensitive: 是否区分大小写
+            use_regex: 是否使用正则表达式
+
+        Returns:
+            int: 匹配总数
+        """
+        self._matches.clear()
+        self._current_match_index = -1
+
+        if not pattern:
+            self.highlight_matches()
+            return 0
+
+        text = self.toPlainText()
+        flags = 0
+        if not case_sensitive:
+            flags |= re.IGNORECASE
+
+        try:
+            if use_regex:
+                regex = re.compile(pattern, flags)
+            else:
+                regex = re.compile(re.escape(pattern), flags)
+        except re.error:
+            # 正则表达式语法错误
+            self.highlight_matches()
+            return 0
+
+        for match in regex.finditer(text):
+            self._matches.append((match.start(), match.end()))
+
+        if self._matches:
+            self._current_match_index = 0
+        else:
+            self._current_match_index = -1
+
+        # 无论有没有匹配都要更新高亮，清空旧的匹配
+        self.highlight_matches()
+        return len(self._matches)
+
+    def highlight_matches(self):
+        """高亮所有匹配项"""
+        extra_selections = []
+
+        # 保留原有的当前行高亮
+        if not self.isReadOnly():
+            selection = QTextEdit.ExtraSelection()
+            line_color = QColor("#3c3f41")
+            selection.format.setBackground(line_color)
+            selection.format.setProperty(QTextFormat.FullWidthSelection, True)
+            selection.cursor = self.textCursor()
+            selection.cursor.clearSelection()
+            extra_selections.append(selection)
+
+        # 高亮所有匹配项
+        for i, (start, end) in enumerate(self._matches):
+            selection = QTextEdit.ExtraSelection()
+            cursor = self.textCursor()
+            cursor.setPosition(start)
+            cursor.setPosition(end, QTextCursor.KeepAnchor)
+            selection.cursor = cursor
+
+            if i == self._current_match_index:
+                # 当前匹配项：淡橘色
+                selection.format.setBackground(QColor("#ffd3b6"))
+                selection.format.setForeground(QColor("#000000"))
+            else:
+                # 其他匹配项：淡蓝灰色
+                selection.format.setBackground(QColor("#a9c4eb"))
+                selection.format.setForeground(QColor("#000000"))
+
+            extra_selections.append(selection)
+
+        self.setExtraSelections(extra_selections)
+
+    def find_next(self):
+        """
+        跳到下一个匹配项
+
+        Returns:
+            bool: 是否成功
+        """
+        if not self._matches:
+            return False
+
+        self._current_match_index = (self._current_match_index + 1) % len(self._matches)
+        self.highlight_matches()
+
+        # 只滚动到可见区域，不移动光标
+        if self._current_match_index >= 0:
+            start, _ = self._matches[self._current_match_index]
+            # 滚动到匹配项位置但不改变光标
+            cursor = self.textCursor()
+            original_pos = cursor.position()
+            cursor.setPosition(start)
+            self.setTextCursor(cursor)
+            self.ensureCursorVisible()
+            # 恢复原光标位置
+            cursor.setPosition(original_pos)
+            self.setTextCursor(cursor)
+
+        return True
+
+    def find_previous(self):
+        """
+        跳到上一个匹配项
+
+        Returns:
+            bool: 是否成功
+        """
+        if not self._matches:
+            return False
+
+        self._current_match_index = (self._current_match_index - 1) % len(self._matches)
+        self.highlight_matches()
+
+        # 只滚动到可见区域，不移动光标
+        if self._current_match_index >= 0:
+            start, _ = self._matches[self._current_match_index]
+            # 滚动到匹配项位置但不改变光标
+            cursor = self.textCursor()
+            original_pos = cursor.position()
+            cursor.setPosition(start)
+            self.setTextCursor(cursor)
+            self.ensureCursorVisible()
+            # 恢复原光标位置
+            cursor.setPosition(original_pos)
+            self.setTextCursor(cursor)
+
+        return True
+
+    def replace_current(self, replace_str):
+        """
+        替换当前匹配项
+
+        Args:
+            replace_str: 替换文本
+
+        Returns:
+            bool: 是否成功
+        """
+        if self._current_match_index < 0 or self._current_match_index >= len(self._matches):
+            return False
+
+        # 获取当前匹配项位置
+        start, end = self._matches[self._current_match_index]
+
+        # 替换文本
+        cursor = self.textCursor()
+        cursor.setPosition(start)
+        cursor.setPosition(end, QTextCursor.KeepAnchor)
+        cursor.insertText(replace_str)
+
+        # 重新搜索，因为文本已经变化
+        pattern = self._current_search_pattern if hasattr(self, '_current_search_pattern') else ""
+        case_sensitive = self._current_case_sensitive if hasattr(self, '_current_case_sensitive') else True
+        use_regex = self._current_use_regex if hasattr(self, '_current_use_regex') else False
+
+        # 保存当前搜索参数用于重新搜索
+        self._current_search_pattern = pattern
+        self._current_case_sensitive = case_sensitive
+        self._current_use_regex = use_regex
+
+        total = self.find_all(pattern, case_sensitive, use_regex)
+        return total > 0
+
+    def replace_all(self, replace_str):
+        """
+        替换所有匹配项
+
+        Args:
+            replace_str: 替换文本
+
+        Returns:
+            int: 替换数量
+        """
+        if not self._matches:
+            return 0
+
+        # 临时保存匹配项副本，避免替换过程中被信号修改
+        matches = list(self._matches)
+        # 从后往前替换，避免位置偏移
+        matches.sort(reverse=True, key=lambda x: x[0])
+
+        # 临时阻塞信号，避免替换过程中触发自动搜索
+        self.blockSignals(True)
+
+        cursor = self.textCursor()
+        cursor.beginEditBlock()  # 开始编辑块，支持撤销
+
+        count = 0
+        try:
+            for start, end in matches:
+                cursor.setPosition(start)
+                cursor.setPosition(end, QTextCursor.KeepAnchor)
+                cursor.insertText(replace_str)
+                count += 1
+        finally:
+            cursor.endEditBlock()  # 结束编辑块
+            self.blockSignals(False)
+
+        self._matches.clear()
+        self._current_match_index = -1
+        self.highlight_matches()
+        return count
+
+    def get_current_match_index(self):
+        """
+        获取当前匹配项索引
+
+        Returns:
+            int: 当前索引(从0开始)，没有匹配返回-1
+        """
+        return self._current_match_index
+
+    def get_match_count(self):
+        """
+        获取匹配总数
+
+        Returns:
+            int: 匹配总数
+        """
+        return len(self._matches)

@@ -162,7 +162,22 @@ class MainWindow(QMainWindow):
         exit_action.setShortcut("Ctrl+Q")
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
-        
+
+        # 编辑菜单
+        edit_menu = menubar.addMenu("编辑(&E)")
+
+        # 查找动作
+        find_action = QAction("查找(&F)", self)
+        find_action.setShortcut("Ctrl+F")
+        find_action.triggered.connect(self._show_search)
+        edit_menu.addAction(find_action)
+
+        # 替换动作
+        replace_action = QAction("替换(&R)", self)
+        replace_action.setShortcut("Ctrl+R")
+        replace_action.triggered.connect(self._show_replace)
+        edit_menu.addAction(replace_action)
+
         # 查看菜单
         view_menu = menubar.addMenu("查看(&V)")
 
@@ -555,3 +570,19 @@ class MainWindow(QMainWindow):
                 text_editor = tab_content.get_text_editor()
                 if text_editor:
                     text_editor.set_language(language)
+
+    def _show_search(self):
+        """显示搜索组件"""
+        current_index = self.tab_widget.currentIndex()
+        if current_index >= 0:
+            tab_content = self.tab_widget.widget(current_index)
+            if tab_content:
+                tab_content.show_search()
+
+    def _show_replace(self):
+        """显示替换组件"""
+        current_index = self.tab_widget.currentIndex()
+        if current_index >= 0:
+            tab_content = self.tab_widget.widget(current_index)
+            if tab_content:
+                tab_content.show_replace()
