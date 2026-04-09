@@ -85,6 +85,10 @@ class TextEditor(QWidget):
         # 将文本编辑框添加到布局
         layout.addWidget(self.text_edit)
 
+        # 默认开启自动换行
+        from PySide6.QtWidgets import QPlainTextEdit
+        self.text_edit.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
+
         # 设置大小策略，确保高度一致
         from PySide6.QtWidgets import QSizePolicy
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -267,6 +271,35 @@ class TextEditor(QWidget):
     def clear_search_highlight(self):
         """清除搜索高亮"""
         self.text_edit.find_all("")
+
+    def set_line_wrap(self, enabled):
+        """
+        设置自动换行状态
+
+        Args:
+            enabled: True 开启自动换行，False 关闭自动换行
+        """
+        from PySide6.QtWidgets import QPlainTextEdit
+        if enabled:
+            self.text_edit.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
+        else:
+            self.text_edit.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+
+    def toggle_line_wrap(self):
+        """切换自动换行状态"""
+        current_enabled = self.is_line_wrap_enabled()
+        self.set_line_wrap(not current_enabled)
+        return not current_enabled
+
+    def is_line_wrap_enabled(self):
+        """
+        获取当前自动换行状态
+
+        Returns:
+            bool: True 已开启自动换行，False 已关闭
+        """
+        from PySide6.QtWidgets import QPlainTextEdit
+        return self.text_edit.lineWrapMode() == QPlainTextEdit.LineWrapMode.WidgetWidth
 
 
 class CodeEditor(CustomPlainTextEdit):

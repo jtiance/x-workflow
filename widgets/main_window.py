@@ -112,9 +112,12 @@ class MainWindow(QMainWindow):
         
         # 连接默认"+"按钮的信号到添加新标签页方法
         self.tab_widget.tabAddRequested.connect(self._add_new_tab)
-        
+
         # 连接标签页关闭信号
         self.tab_widget.tabCloseRequested.connect(self._on_tab_close_requested)
+
+        # 连接标签页切换信号，用于更新自动换行勾选状态
+        self.tab_widget.currentChanged.connect(self._on_tab_changed)
         
         # 将标签页控件添加到中心布局
         layout.addWidget(self.tab_widget)
@@ -196,6 +199,13 @@ class MainWindow(QMainWindow):
         zoom_out_action.setShortcut("Ctrl+-")
         zoom_out_action.triggered.connect(self._zoom_out_text)
         font_menu.addAction(zoom_out_action)
+
+        # 自动换行动作
+        self.line_wrap_action = QAction("自动换行(&W)", self)
+        self.line_wrap_action.setCheckable(True)
+        self.line_wrap_action.setChecked(True)  # 默认开启自动换行
+        self.line_wrap_action.triggered.connect(self._toggle_line_wrap)
+        view_menu.addAction(self.line_wrap_action)
 
         # 语法菜单
         syntax_menu = menubar.addMenu("语法(&S)")
@@ -586,3 +596,30 @@ class MainWindow(QMainWindow):
             tab_content = self.tab_widget.widget(current_index)
             if tab_content:
                 tab_content.show_replace()
+
+    def _toggle_line_wrap(self, checked):
+        """
+        切换自动换行状态
+
+        Args:
+            checked: 是否勾选自动换行
+        """
+        # 获取当前标签页
+        current_index = self.tab_widget.currentIndex()
+        if current_index >= 0:
+            tab_content = self.tab_widget.widget(current_index)
+            if tab_content:
+                text_editor = tab_content.get_text_editor()
+                if text_editor:
+                    text_editor.set_line_wrap(checked)
+
+    def _on_tab_changed(self, index):
+        """
+        当标签页切换时调用，更新自动换行动作的勾选状态
+        """
+        if index >= 0:
+            tab_content = self.tab_widget.widget(index)
+            if tab_content:
+                text_editor = tab_content.get_text_editor()
+                if text_editor:
+                    self.line_wrap_action.setChecked(text_editor.is_line_wrap_enabled())
