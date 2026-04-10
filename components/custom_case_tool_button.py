@@ -6,6 +6,8 @@ from PySide6 import QtCore
 from PySide6.QtGui import QIcon
 from qfluentwidgets import TransparentToggleToolButton
 
+from utils.resource_util import get_resource_path
+
 
 class CustomCaseToolButton(TransparentToggleToolButton):
     """
@@ -25,8 +27,8 @@ class CustomCaseToolButton(TransparentToggleToolButton):
         super().__init__(parent)
 
         # 图标路径
-        self._icon_white = QIcon("icons/忽略大小写_白色.svg")
-        self._icon_black = QIcon("icons/忽略大小写_黑色.svg")
+        self._icon_white = QIcon(str(get_resource_path("icons/忽略大小写_白色.svg")))
+        self._icon_black = QIcon(str(get_resource_path("icons/忽略大小写_黑色.svg")))
 
         # 设置图标大小
         self.setIconSize(icon_size)

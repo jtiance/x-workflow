@@ -6,6 +6,8 @@ from PySide6 import QtCore
 from PySide6.QtGui import QIcon
 from qfluentwidgets import TransparentToolButton
 
+from utils.resource_util import get_resource_path
+
 
 class CustomReplaceAllToolButton(TransparentToolButton):
     """
@@ -24,7 +26,7 @@ class CustomReplaceAllToolButton(TransparentToolButton):
         super().__init__(parent)
 
         # 图标路径
-        self._icon_white = QIcon("icons/替换全部_白色.svg")
+        self._icon_white = QIcon(str(get_resource_path("icons/替换全部_白色.svg")))
 
         # 设置图标大小
         self.setIconSize(icon_size)

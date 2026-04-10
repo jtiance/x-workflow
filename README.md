@@ -81,7 +81,7 @@ python main.py
 ### 使用 Poetry 打包
 
 ```bash
-poetry run pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --add-data "workflow-config.json:." --add-data "X-Workflow.png:." --add-data "X-Workflow.icns:." main.py
+poetry run pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --add-data "workflow-config.json:." --add-data "X-Workflow.png:." --add-data "X-Workflow.icns:." --add-data "icons:icons"  main.py
 ```
 
 ### 最简打包方法（不使用 Poetry）
@@ -96,7 +96,7 @@ python3 -m pip install pyinstaller -i https://pypi.tuna.tsinghua.edu.cn/simple -
 python3 -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
 
 # 执行打包
-pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --add-data "workflow-config.json:." --add-data "X-Workflow.png:." --add-data "X-Workflow.icns:." main.py
+pyinstaller --name X-Workflow --windowed --icon "X-Workflow.icns" --add-data "workflow-config.json:." --add-data "X-Workflow.png:." --add-data "X-Workflow.icns:." --add-data "icons:icons" main.py
 ```
 
 打包完成后，可执行文件位于 `dist/X-Workflow` 目录下。
@@ -120,11 +120,26 @@ x-workflow/
 │   ├── workflow_dialogs.py     # 工作流保存/加载/管理对话框
 │   └── arrow_button.py         # 箭头按钮组件
 ├── components/                   # 自定义组件
+│   ├── __init__.py
 │   ├── custom_edit_layer.py   # 自定义编辑层（无边条）
 │   ├── custom_text_edit.py     # 自定义文本编辑器
 │   ├── custom_tab_bar.py       # 自定义标签栏
 │   ├── custom_tab_item.py     # 自定义标签项
-│   └── syntax_highlighter.py   # 语法高亮器
+│   ├── syntax_highlighter.py   # 语法高亮器
+│   ├── custom_regex_tool_button.py      # 正则表达式切换按钮
+│   ├── custom_case_tool_button.py       # 忽略大小写切换按钮
+│   ├── custom_replace_tool_button.py    # 替换按钮
+│   └── custom_replace_all_tool_button.py # 全部替换按钮
+├── utils/                        # 工具类
+│   ├── __init__.py
+│   └── resource_util.py        # 资源文件路径管理工具（兼容开发/打包环境）
+├── icons/                        # 图标资源
+│   ├── 正则表达式_白色.svg
+│   ├── 正则表达式_黑色.svg
+│   ├── 忽略大小写_白色.svg
+│   ├── 忽略大小写_黑色.svg
+│   ├── 替换_白色.svg
+│   └── 替换全部_白色.svg
 ├── controls/                    # 流程控件
 │   ├── __init__.py
 │   ├── base_control.py         # 控件基类
@@ -203,6 +218,15 @@ x-workflow/
 - 支持多种编程语言的语法高亮（基于 Pygments）
 - 自动根据语言类型应用高亮样式
 - 支持纯文本模式（无高亮）
+
+### 8. 搜索替换功能
+
+- 支持实时查找文本
+- 支持正则表达式匹配
+- 支持忽略大小写匹配
+- 支持替换当前匹配项
+- 支持替换所有匹配项
+- 快捷键支持，操作高效
 
 ## 控件说明
 
@@ -322,6 +346,19 @@ x-workflow/
 ---
 
 ## 版本历史
+
+### v1.5.0
+
+- 新增搜索替换功能（支持正则表达式、忽略大小写、替换、替换全部）
+- 新增4种自定义图标按钮组件，采用SVG矢量图标
+- 统一资源管理工具类 `utils/resource_util.py`，自动适配开发环境和PyInstaller打包环境
+- 优化打包配置，支持批量添加SVG图标资源
+- 新增搜索替换功能快捷键：
+  - `Ctrl+F`：打开搜索替换面板
+  - `Enter`：查找下一个
+  - `Shift+Enter`：查找上一个
+  - `Ctrl+Enter`：替换当前
+  - `Ctrl+Shift+Enter`：替换全部
 
 ### v1.4.0
 

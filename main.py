@@ -12,20 +12,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import setTheme, Theme
 
+from utils.resource_util import get_resource_path
 from widgets.main_window import MainWindow
-
-
-def get_resource_path(relative_path):
-    """
-    获取资源文件的绝对路径，兼容开发环境和 PyInstaller 打包环境
-    """
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        # PyInstaller 打包后的环境
-        base_path = Path(sys._MEIPASS)
-    else:
-        # 开发环境
-        base_path = Path(__file__).parent
-    return base_path / relative_path
 
 
 def initialize_config():
