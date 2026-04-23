@@ -1,0 +1,5 @@
+签名:
+codesign --deep --force --verbose \
+  --sign "X-Workflow-Cert" \
+  --entitlements entitlements.plist \
+  dist/X-Workflow.app
