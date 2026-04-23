@@ -260,8 +260,11 @@ class TabContent(QWidget):
             self.process_worker.intermediate_result.connect(self._on_intermediate_result)
             self.process_worker.progress.connect(self._on_process_progress)
             self.process_worker.error.connect(self._on_process_error)
+            # 连接完成和错误信号以清理线程
             self.process_worker.finished.connect(self.process_thread.quit)
+            self.process_worker.error.connect(self.process_thread.quit)
             self.process_thread.finished.connect(self.process_thread.deleteLater)
+            self.process_thread.finished.connect(self.process_worker.deleteLater)
 
             # 启动线程
             self.process_thread.start()
