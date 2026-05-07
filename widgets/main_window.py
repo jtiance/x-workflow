@@ -500,7 +500,6 @@ class MainWindow(QMainWindow):
             from controls.html_format import HtmlFormatControl
             control = HtmlFormatControl()
             tab_content.add_control(control)
-
         elif control_type == "read_excel_column":
             from controls.read_excel_column import ReadExcelColumnControl
             control = ReadExcelColumnControl()
@@ -524,6 +523,11 @@ class MainWindow(QMainWindow):
         elif control_type == "html_extract":
             from controls.html_extract import HtmlExtractControl
             control = HtmlExtractControl()
+            tab_content.add_control(control)
+
+        elif control_type == "calculator":
+            from controls.calculator import CalculatorControl
+            control = CalculatorControl()
             tab_content.add_control(control)
 
     def _show_about(self):

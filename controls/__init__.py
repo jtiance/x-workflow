@@ -20,6 +20,7 @@ from .excel_to_json import ExcelToJsonControl
 from .random_number import RandomNumberControl
 from .html_extract import HtmlExtractControl
 from .delete_lines import DeleteLinesControl
+from .calculator import CalculatorControl
 
 __all__ = ['BaseControl', 'TextReplaceControl', 'JsonFormatControl', 'JsonCompressControl', 'AddTextControl', 'CaseConvertControl', 'TextSplitControl', 'TextMergeControl', 'TextSearchDeleteControl', 'RemoveDuplicateControl', 'RemoveEmptyLinesControl', 'TextTrimControl',
-           'ReadExcelColumnControl', 'DatetimeConvertControl', 'RandomDatetimeControl', 'ExcelToJsonControl', 'RandomNumberControl', 'HtmlExtractControl', 'DeleteLinesControl']
+           'ReadExcelColumnControl', 'DatetimeConvertControl', 'RandomDatetimeControl', 'ExcelToJsonControl', 'RandomNumberControl', 'HtmlExtractControl', 'DeleteLinesControl', 'CalculatorControl']

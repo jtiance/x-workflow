@@ -172,23 +172,24 @@ class ControlDialog(CustomDialog):
             ("日期时间转换", "datetime_convert"),
             ("随机时间生成", "random_datetime"),
             ("随机数字生成", "random_number"),
+            ("计算器", "calculator"),
         ]
 
         # 定义控件分类映射
         category_map = {
+            "JSON类": [
+                "json_format", "json_compress"
+            ],
+            "数字类": [
+                "random_number", "calculator"
+            ],
             "文本类": [
                 "text_replace", "add_text", "case_convert", "text_split",
                 "text_merge", "text_search_delete", "delete_lines", "remove_duplicate",
                 "remove_empty_lines", "text_trim", "html_extract"
             ],
-            "JSON类": [
-                "json_format", "json_compress"
-            ],
             "格式化类": [
                 "json_format", "json_compress", "xml_format", "html_format"
-            ],
-            "数字类": [
-                "random_number"
             ],
             "日期类": [
                 "datetime_convert", "random_datetime"
@@ -615,6 +616,19 @@ class ControlDialog(CustomDialog):
             preview_control.set_whitespace_mode("remove_empty")
 
             # 添加到预览区域
+            self.preview_layout.addWidget(preview_control)
+            self.preview_layout.addStretch()
+
+        elif control_type == "calculator":
+            from controls.calculator import CalculatorControl
+
+            preview_control = CalculatorControl()
+            preview_control.setEnabled(False)
+            if hasattr(preview_control, 'set_buttons_visible'):
+                preview_control.set_buttons_visible(False)
+
+            preview_control.set_precision(2)
+
             self.preview_layout.addWidget(preview_control)
             self.preview_layout.addStretch()
 
