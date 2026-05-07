@@ -2,7 +2,6 @@
 .trae/
 __pycache__/
 *.pyc
-X-Workflow.spec
 dist/
 build/
 .claude/
